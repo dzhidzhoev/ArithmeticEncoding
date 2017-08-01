@@ -1,0 +1,22 @@
+#pragma once
+
+enum {
+    ARI,
+    PPM,
+    BWT
+};
+
+typedef struct CompressOptions {
+    char *ifile;
+    char *ofile;
+    char mode;
+    int  method;
+} CompressOptions;
+
+CompressOptions *parse_args(int argc, char **argv);
+
+CompressOptions *default_config(void);
+
+void print_config(CompressOptions *opts);
+
+void free_compress_opts(CompressOptions *opts);
