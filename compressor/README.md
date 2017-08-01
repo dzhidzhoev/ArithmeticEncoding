@@ -7,7 +7,7 @@
 Не списывайте, будем карать.
 
 ## Технические детали
-**Windows**
+### **Windows**
 1. В первую очередь ставим Git (https://git-scm.com/download/win).
 2. Теперь ставим CMake (https://cmake.org/download/).
 3. Запускаем Windows PowerShell.
