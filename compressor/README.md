@@ -62,7 +62,7 @@
 --method {ari | ppm | bwt} = Метод архивации/разархивации файла, по умолчанию `ari`.
 ```
 
-Например, если мы хотим сжать файл the_financier.txt в файл the_financier.cmp методом PPM, то команда будет выглядеть так:
+Например, если мы хотим заархивировать файл the_financier.txt в файл the_financier.cmp методом PPM, то команда будет выглядеть так:
 
 ```cmd
 > compress.exe --input the_financier.txt --output the_financier.cmp --mode c --method ppm
