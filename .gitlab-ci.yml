@@ -1,3 +1,6 @@
+image: ubuntu
+
+
 test:
   script:
     - apt install cmake
@@ -6,9 +9,8 @@ test:
     - cd bin
     - cmake -G "Unix Makefiles" ../src
     - make
-    - python ../../test.py
-  tags:
-    - linux
+    - cd ../..
+    - python test.py
   artifacts:
     paths:
-        - build/VQMT3D/bin
+        - compressor/project/bin
