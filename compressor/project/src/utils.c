@@ -13,13 +13,13 @@ Options\n\n\
   --input  <file>            = Specify input file to compress/decompress.\n\
   --output <file>            = Specify output file to write a result.\n\
   --mode   {c | d}           = Use specified mode, `c` to compress and `d` to decompress.\n\
-  --method {ari | ppm | bwt} = Use specified method of data compression/decompression.\n\n";
+  --method {ari | ppm | bwt} = Use specified method of data compression/decompression.\n";
 
     CompressOptions *opts = default_config();
 
     for (int i = 1; i < argc; i++) {
         if (!strcmp(argv[i], "--help")) {
-            printf(help);
+            printf("%s\n", help);
             free_compress_opts(opts);
             return NULL;
         }
