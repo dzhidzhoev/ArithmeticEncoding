@@ -3,7 +3,8 @@ image: ubuntu
 
 test:
   script:
-    - apt install --yes cmake
+    - apt update
+    - apt install cmake
     - cd compressor/project
     - mkdir bin
     - cd bin
