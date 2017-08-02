@@ -4,7 +4,7 @@ image: ubuntu
 test:
   script:
     - apt update
-    - apt install cmake
+    - apt install --yes cmake
     - cd compressor/project
     - mkdir bin
     - cd bin
