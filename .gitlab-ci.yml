@@ -6,13 +6,14 @@ test:
     - apt update
     - apt install --yes cmake
     - apt install --yes g++
+    - apt install --yes python3
     - cd compressor/project
     - mkdir bin
     - cd bin
     - cmake -G "Unix Makefiles" ../src
     - make
     - cd ../..
-    - python test.py
+    - python3 test.py
   artifacts:
     paths:
         - compressor/project/bin
