@@ -122,30 +122,24 @@ CompressOptions *default_config(void) {
 
 void print_config(CompressOptions *opts) {
     if (opts != NULL) {
-        if (opts->ifile != NULL) {
-            printf("Input file: `%s`\n", opts->ifile);
-        }
-
-        if (opts->ofile != NULL) {
-            printf("Output file: `%s`\n", opts->ofile);
-        }
-
         if (opts->mode == 'c') {
-            printf("Mode: compression\n");
+            printf("Compression from `%s` to `%s`\n", opts->ifile, opts->ofile);
         }
         else if (opts->mode == 'd') {
-            printf("Mode: decompression\n");
+            printf("Decompression from `%s` to `%s`\n", opts->ifile, opts->ofile);
         }
 
         if (opts->method == ARI) {
-            printf("Compression: arithmetic encoding\n");
+            printf("Method: arithmetic encoding\n");
         }
         else if (opts->method == PPM) {
-            printf("Compression: PPM\n");
+            printf("Method: PPM\n");
         }
         else if (opts->method == BWT) {
-            printf("Compression: arithmetic encoding with Burrows-Wheeler transform\n");
+            printf("Method: arithmetic encoding with Burrows-Wheeler transform\n");
         }
+
+        printf("\n");
     }
 }
 

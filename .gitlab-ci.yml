@@ -1,0 +1,14 @@
+test:
+  script:
+    - apt install cmake
+    - cd compressor/project
+    - mkdir bin
+    - cd bin
+    - cmake -G "Unix Makefiles" ../src
+    - make
+    - python ../../test.py
+  tags:
+    - linux
+  artifacts:
+    paths:
+        - build/VQMT3D/bin
