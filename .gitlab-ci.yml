@@ -5,7 +5,7 @@ test:
   script:
     - apt update
     - apt install --yes cmake
-    - apt install g++
+    - apt install --yes g++
     - cd compressor/project
     - mkdir bin
     - cd bin
