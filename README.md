@@ -4,55 +4,168 @@
 Вам необходимо реализовать архиватор.
 
 ## Правила
-Не списывайте, будем карать.
+* Не списывайте, будем карать.
+* После дедлайна из вашего репозитория берется последний успешный коммит
+и проводится его тестирование на закрытом наборе.
 
-## Технические детали
+## Алгоритм действий
+1. Зарегистрировать аккаунт на GitLab.
+2. Fork'нуть себе этот проект, сделать его закрытым.
+3. Прислать ссылку на репозиторий куратору курса.
+4. Собрать шаблон на своём компьютере.
+5. Реализовать архиватор.
+6. Запушить итоговую версию в свой репозиторий на GitLab.
+
+## Сборка
+### **Ubuntu**
+1. Обновляем package list:
+
+    ```sh
+    sudo apt update
+    ```
+    
+2. Устанавливаем всё необходимое.
+
+    ```sh
+    sudo apt install --yes git
+    sudo apt install --yes cmake
+    sudo apt install --yes g++
+    sudo apt install --yes python3
+    ```
+    
+3. Клонируем репозиторий в вашу любимую папку:
+
+    ```sh
+    cd path/to/favorite/folder
+    git clone https://gitlab.com/Ploshkin/compression.git
+    ```
+    После этого там должна появиться папка compression.
+    
+4. Заходим в папку compression/project, создаём папку bin и заходим в неё:
+
+    ```sh
+    cd compression/project
+    mkdir bin
+    cd bin
+
+    ```
+
+5. Теперь конфигурируем проект с помощью CMake, указав ../src как папку
+    с исходниками, а после ключа `-G` — формат проекта, который мы хотим получить.
+    Например, эта команда сгенерирует самый обыкновенный Makefile:
+
+    ```sh
+    cmake -G "Unix Makefiles" ../src
+    ```
+    
+    А эта — проект для CodeBlocks:
+    
+    ```sh
+    cmake -G "CodeBlocks - Unix Makefiles" ../src
+    ```
+    
+    Все поддерживаемые форматы можно найти в справке `cmake --help`.
+    В дальнейшем вам **не нужно** будет конфигурировать проект повторно.
+    
+6. Собираем проект удобным образом, например:
+
+    ```sh
+    make  # нужно быть в папке compression/project/bin
+    ```
+    
+7. Проверяем папку compression/project/bin на наличие исполняемого файла
+   compress.
+8. Тестируем шаблон:
+
+    ```sh
+    cd ../..  # поднимаемся из bin в папку compression
+    python3 test.py
+    ```
+    
+    После успешного выполнения тестов в папке compression появится файл
+    res.csv, который можно открыть и посмотреть, что тестирование
+    действительно прошло успешно.
+9. Ура, всё получилось! Вы готовы создавать лучший в мире архиватор.
+    
+    
 ### **Windows**
-1. В первую очередь ставим Git (https://git-scm.com/download/win).
+Эпиграф:
+
+— Надо было ставить Linux!
+
+1. В первую очередь ставим Git (https://git-for-windows.github.io/).
 2. Теперь ставим CMake (https://cmake.org/download/).
-3. Запускаем Windows PowerShell.
-4. Дальше в командной строке заходим в папку, где хотим видеть репозиторий,
-и клонируем его:
+3. Для тестирующего скрипта ставим интерпретатор Python (https://www.python.org/downloads/).
+4. На всякий случай ставим MinGW (https://sourceforge.net/projects/mingw/files/Installer/).
+    Основной сайт: http://www.mingw.org/
+5. Запускаем Windows PowerShell.
+6. Клонируем репозиторий в вашу любимую папку:
 
-    ```cmd
-    > cd path\to\directory
-    > git clone https://gitlab.com/Ploshkin/gml-video-tasks.git
+    ```sh
+    cd path/to/favorite/folder
+    git clone https://gitlab.com/Ploshkin/compression
     ```
-    После этого там должна появиться папка gml-video-tasks.
+    После этого там должна появиться папка compression.
     
-5. Заходим в папку project, создаём папку bin и заходим в неё:
+7. Заходим в папку compression/project, создаём папку bin и заходим в неё:
 
-    ```cmd
-    > cd .\compressor\project
-    > mkdir bin
-    > cd .\bin
+    ```sh
+    cd compression/project
+    mkdir bin
+    cd bin
 
+    ```
+
+8. Теперь конфигурируем проект с помощью CMake, указав ../src как папку
+    с исходниками, а после ключа `-G` — формат проекта, который мы хотим получить.
+    Например, эта команда сгенерирует самый обыкновенный Makefile:
+
+    ```sh
+    cmake -G "MinGW Makefiles" ../src
     ```
     
-6. Теперь генерируем проект с помощью CMake, указав ..\src как папку с исходниками:
-
-    ```cmd
-    > cmake -G "MinGW Makefiles" ..\src
+    А эта — проект для CodeBlocks:
+    
+    ```sh
+    cmake -G "CodeBlocks - MinGW Makefiles" ../src
     ```
-    В примере мы с помощью опции `-G` указали, что хотим проект в виде мейкфайла для компилятора MinGW.
-    Можно выбрать любой удобный формат, например, проект для CodeBlocks или VisualStudio.
-    Для этого надо найти имя генератора в справке `cmake --help` и указать его после ключа `-G`.
+    
+    Все поддерживаемые форматы можно найти в справке `cmake --help`.
+    В дальнейшем вам **не нужно** будет конфигурировать проект повторно.
+    
+9. Собираем проект удобным образом, например:
 
-7. Собираем проект удобным образом, например:
-
-    ```cmd
-    > mingw32-make
+    ```sh
+    mingw32-make  # нужно быть в папке compression/project/bin
     ```
+    
+10. Проверяем папку compression/project/bin на наличие исполняемого файла
+   compress.exe.
+11. Тестируем шаблон:
 
-8. Вуаля, в папке bin появляется куча всяких файлов, в том числе compress.exe, который можно запускать.
-9. В дальнейшем для перекомпиляции вам понадобится проделывать только пункт 7 (пункт 6 проделывается только один раз).
+    ```sh
+    cd ../..  # поднимаемся из bin в папку compression
+    python test.py
+    ```
+    
+    После успешного выполнения тестов в папке compression появится файл
+    res.csv, который можно открыть и посмотреть, что тестирование
+    действительно прошло успешно.
+12. Ура, всё получилось! Вы готовы создавать лучший в мире архиватор.
 
 ## Запуск
 Общий вид:
 
-```cmd
-> compress.exe [options]
+```sh
+# Ubuntu
+compress [options]
 ```
+
+```sh
+# Windows
+compress.exe [options]
+```
+
 Опции:
 
 ```cmd
@@ -65,6 +178,12 @@
 
 Например, если мы хотим заархивировать файл the_financier.txt в файл the_financier.cmp методом PPM, то команда будет выглядеть так:
 
-```cmd
-> compress.exe --input the_financier.txt --output the_financier.cmp --mode c --method ppm
+```sh
+# Ubuntu
+compress --input the_financier.txt --output the_financier.cmp --mode c --method ppm
+```
+
+```sh
+# Windows
+compress.exe --input the_financier.txt --output the_financier.cmp --mode c --method ppm
 ```
