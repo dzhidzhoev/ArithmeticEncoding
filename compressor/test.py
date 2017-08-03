@@ -8,14 +8,10 @@ from json import load
 
 
 TEST_SET_DIR = r'./pretests/'
-<<<<<<< HEAD
 
 CMP_EXE = r'./project/bin/compress'
 if platform.system() == 'Windows':
 	CMP_EXE += '.exe'
-=======
-CMP_EXE = r'./project/bin/compress'
->>>>>>> 987ddaf49e2fb2a2507f013f639f8eabf8a9e579
 
 
 class Command(object):
