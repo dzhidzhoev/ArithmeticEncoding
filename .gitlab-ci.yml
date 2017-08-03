@@ -16,4 +16,4 @@ test:
     - python3 test.py
   artifacts:
     paths:
-        - compressor/project/bin
+        - compressor/res.csv
