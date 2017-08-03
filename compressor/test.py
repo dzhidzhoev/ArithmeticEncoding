@@ -2,12 +2,16 @@ import os
 import threading
 import subprocess
 import filecmp
+import platform
 
 from json import load
 
 
 TEST_SET_DIR = r'./pretests/'
-CMP_EXE = r'./project/bin/compress.exe'
+
+CMP_EXE = r'./project/bin/compress'
+if platform.system() == 'Windows':
+	CMP_EXE += '.exe'
 
 
 class Command(object):

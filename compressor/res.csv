@@ -1,0 +1,5 @@
+method,file,size,compressed,conclusion
+ari,test_1,14,14,OK
+ari,test_2,13245,13245,OK
+ari,test_3,226304,226304,OK
+ari,test_4,0,0,OK
