@@ -12,7 +12,7 @@ test:
     - cd bin
     - cmake -G "Unix Makefiles" ../src
     - make
-    - cd ..
+    - cd ../..
     - python3 test.py
   artifacts:
     paths:
