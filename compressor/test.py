@@ -53,14 +53,14 @@ def run_tests(methods):
     res = {}
     for method in methods:
         res.update({method: []})
-        for test_file in os.listdir(TEST_SET_DIR):
+        for test_file in sorted(os.listdir(TEST_SET_DIR)):
             if os.path.isfile(os.path.join(TEST_SET_DIR, test_file)):
                 conclusion = None
 
                 size_before = os.path.getsize(os.path.join(TEST_SET_DIR, test_file))
 
                 # [RE1, TL1]
-                cmpr_args = [CMP_EXE,
+                cmpr_args = [os.path.abspath(CMP_EXE),
                              '--input',  test_file,
                              '--output', test_file + '.cmp', 
                              '--mode',   'c',
@@ -71,7 +71,7 @@ def run_tests(methods):
 
                 if cmpr_err_code == 'OK':
                     # [RE2, TL2]
-                    dcmp_args = [CMP_EXE,
+                    dcmp_args = [os.path.abspath(CMP_EXE),
                                  '--input',  test_file + '.cmp',
                                  '--output', test_file + '.dcm', 
                                  '--mode',   'd',
