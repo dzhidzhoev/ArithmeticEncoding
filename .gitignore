@@ -3,6 +3,7 @@ project/bin
 
 # All .txt files
 *.txt
+!CMakeLists.txt
 
 # Result files
 *.csv
