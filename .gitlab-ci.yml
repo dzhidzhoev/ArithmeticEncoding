@@ -16,4 +16,5 @@ test:
     - python3 test.py
   artifacts:
     paths:
-        - compressor/res.csv
+        - res.csv
+    expire_in: 3 weeks
