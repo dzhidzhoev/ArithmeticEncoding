@@ -7,12 +7,12 @@ test:
     - apt install --yes cmake
     - apt install --yes g++
     - apt install --yes python3
-    - cd compressor/project
+    - cd project
     - mkdir bin
     - cd bin
     - cmake -G "Unix Makefiles" ../src
     - make
-    - cd ../..
+    - cd ..
     - python3 test.py
   artifacts:
     paths:
