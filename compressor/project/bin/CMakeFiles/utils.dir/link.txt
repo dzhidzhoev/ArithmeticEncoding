@@ -1,2 +1,0 @@
-C:\Strawberry\c\bin\ar.exe qc libutils.a  CMakeFiles/utils.dir/utils.c.obj CMakeFiles/utils.dir/ari.c.obj CMakeFiles/utils.dir/ppm.c.obj CMakeFiles/utils.dir/bwt.c.obj
-C:\Strawberry\c\bin\ranlib.exe libutils.a
