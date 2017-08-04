@@ -4,15 +4,12 @@ image: ubuntu
 test:
   script:
     - apt update
-    - apt install --yes cmake
-    - apt install --yes g++
-    - apt install --yes python3
-    - cd project
-    - mkdir bin
-    - cd bin
+    - apt install --y cmake g++ python3
+    - mkdir build
+    - cd build
     - cmake -G "Unix Makefiles" ../src
     - make
-    - cd ../..
+    - cd ..
     - python3 test.py
   artifacts:
     paths:

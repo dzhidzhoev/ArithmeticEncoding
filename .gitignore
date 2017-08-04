@@ -1,5 +1,5 @@
-# Bin folder
-project/bin
+# Build folder
+build
 
 # All .txt files
 *.txt

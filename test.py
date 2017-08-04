@@ -132,12 +132,12 @@ def save_results(res, filename='res.csv'):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Testing script', prog='test')
     parser.add_argument('--timeout', type=float, default=180.0)
-    parser.add_argument('--testdir', type=str, default='./pretests')
+    parser.add_argument('--testdir', type=str, default='./tests')
 
     if platform.system() == 'Windows':
-        cmp_exe = './project/bin/compress.exe'
+        cmp_exe = './build/compress.exe'
     else:
-        cmp_exe = './project/bin/compress'
+        cmp_exe = './build/compress'
 
     args = parser.parse_args()
 
