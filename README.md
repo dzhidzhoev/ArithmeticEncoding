@@ -97,11 +97,11 @@
 
 — Надо было ставить Linux!
 
-1. В первую очередь ставим Git (https://git-for-windows.github.io/).
-2. Теперь ставим CMake (https://cmake.org/download/).
-3. Для тестирующего скрипта ставим интерпретатор Python (https://www.python.org/downloads/).
-4. На всякий случай ставим MinGW (https://sourceforge.net/projects/mingw/files/Installer/).
-    Основной сайт: http://www.mingw.org/
+1. В первую очередь ставим [Git for Windows](https://git-for-windows.github.io/).
+2. Теперь ставим [CMake](https://cmake.org/download/).
+3. Для тестирующего скрипта ставим интерпретатор [Python 3](https://www.python.org/downloads/).
+4. На всякий случай ставим [MinGW](http://www.mingw.org/) по этой
+    [ссылке](https://sourceforge.net/projects/mingw/files/Installer/).
 5. Запускаем Windows PowerShell.
 6. Клонируем репозиторий в вашу любимую папку:
 
@@ -208,18 +208,18 @@ Git — это просто, полезно и очень удобно.
 2. Клонировать репозиторий:
     
     ```sh
-    git clone <repo>
+    git clone <repo-url>
     ```
     
-    `repo` — URL к репозиторию.
+    * `repo-url` — URL к репозиторию.
     
 3. Добавить удалённый репозиторий:
 
     ```sh
-    git remote add <name> <repo>
+    git remote add <name> <repo-url>
     ```
     
-    `name` — имя репозитория для использования в дальнейшем в командной строке.
+    * `name` — имя репозитория для использования в дальнейшем в командной строке.
     
     Пример:
     
@@ -247,7 +247,7 @@ Git — это просто, полезно и очень удобно.
     git commit -m "<comment>"
     ```
     
-    `comment` — комментарий к коммиту.
+    * `comment` — комментарий к коммиту.
     
     Эта команда создает в локальном репозитории новую версию проекта,
     которая включает все изменения, добавленные с помощью `git add`.
@@ -264,8 +264,8 @@ Git — это просто, полезно и очень удобно.
     git push <name> <branch>
     ```
     
-    `name` — имя репозитория из пункта 3,
-    `branch` — имя ветки.
+    * `name` — имя репозитория из пункта 3,
+    * `branch` — имя ветки.
     
     Эта команда пушит ваш локальный репозиторий в указанный,
     так что все файлы в указанном репозитории будут обновлены до последней версии.
@@ -311,7 +311,7 @@ git push my_cmpr master
 Вот и всё!
 
 Если вы хотите более подробно ознакомиться с Git:
-https://www.atlassian.com/git/tutorials/setting-up-a-repository
+[Getting Started](https://www.atlassian.com/git/tutorials/setting-up-a-repository)
 
 ## Описание репозитория
 * `config.cfg` — файл с указанием реализованных методов сжатия в формате списка 
@@ -335,7 +335,7 @@ https://www.atlassian.com/git/tutorials/setting-up-a-repository
     python test.py [--testdir <dir>] [--timeout <timeout>]
     ```
     
-    * `dir` — папка, в которой лежат тестовые файлы, по умолчанию 'pretests';
+    * `dir` — папка, в которой лежат тестовые файлы, по умолчанию — pretests;
     * `timeout` — время, отведённое для тестирования каждого файла, по умолчанию
     180с.
     
