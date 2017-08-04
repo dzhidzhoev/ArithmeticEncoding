@@ -5,7 +5,7 @@ test:
   script:
     - apt update
     - apt install --yes cmake
-    - apt install --yes gcc
+    - apt install --yes g++
     - apt install --yes python3
     - cd project
     - mkdir bin
