@@ -31,7 +31,7 @@
 2. Устанавливаем всё необходимое.
 
     ```sh
-    sudo apt install --y git  cmake g++ python3
+    sudo apt install --y git cmake g++ python3
     ```
     
 3. Клонируем репозиторий в вашу любимую папку:
