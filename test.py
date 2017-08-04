@@ -3,6 +3,7 @@ import threading
 import subprocess
 import filecmp
 import platform
+import argparse
 
 from json import load
 
@@ -11,7 +12,7 @@ TEST_SET_DIR = r'./pretests/'
 
 CMP_EXE = r'./project/bin/compress'
 if platform.system() == 'Windows':
-	CMP_EXE += '.exe'
+    CMP_EXE += '.exe'
 
 
 class Command(object):
@@ -53,7 +54,7 @@ def read_config(filename='config.cfg'):
     return methods
 
 
-def run_tests(methods):
+def run_tests(methods, timeout=180.0):
     res = {}
     for method in methods:
         res.update({method: []})
@@ -71,7 +72,7 @@ def run_tests(methods):
                              '--method', method]
 
                 command_compress = Command(cmpr_args)
-                cmpr_err_code = command_compress.run(180.0, cwd=TEST_SET_DIR)
+                cmpr_err_code = command_compress.run(timeout, cwd=TEST_SET_DIR)
 
                 if cmpr_err_code == 'OK':
                     # [RE2, TL2]
@@ -82,7 +83,7 @@ def run_tests(methods):
                                  '--method', method]
 
                     command_decompress = Command(dcmp_args)
-                    dcmp_err_code = command_decompress.run(180.0, cwd=TEST_SET_DIR)
+                    dcmp_err_code = command_decompress.run(timeout, cwd=TEST_SET_DIR)
 
                     if dcmp_err_code == 'OK':
                         size_after = os.path.getsize(os.path.join(TEST_SET_DIR, test_file + '.cmp'))
@@ -135,6 +136,11 @@ def save_results(res, filename='res.csv'):
                                               sample['conclusion']))
 
 
-if __name__ == '__main__': 
-    res = run_tests(read_config())
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Testing script', prog='test')
+    parser.add_argument('--timeout', type=float, default=180.0)
+    args = parser.parse_args()
+
+    methods = read_config()
+    res = run_tests(methods, timeout=args.timeout)
     save_results(res)
