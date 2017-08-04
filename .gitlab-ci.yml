@@ -4,7 +4,7 @@ image: ubuntu
 test:
   script:
     - apt update
-    - apt install --y cmake g++ python3
+    - apt install -y cmake g++ python3
     - mkdir build
     - cd build
     - cmake -G "Unix Makefiles" ../src
