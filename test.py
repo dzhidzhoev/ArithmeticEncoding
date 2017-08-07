@@ -5,12 +5,13 @@ import subprocess
 import filecmp
 import platform
 import argparse
+import logging
 import json
 
 
-TIME_LIMIT = 'time_limit'
-RUNTIME_ERROR = 'runtime_error'
-OK = 'ok'
+TIME_LIMIT = 'TL'
+RUNTIME_ERROR = 'RE'
+OK = 'OK'
 
 
 class Command(object):
@@ -52,6 +53,69 @@ def read_config(filename='config.cfg'):
 
     return methods
 
+def run_test(method, exe, testdir, test_file, timeout):
+    conclusion = None
+
+    size_before = os.path.getsize(os.path.join(testdir, test_file))
+
+    # [RE1, TL1]
+    cmpr_args = [os.path.abspath(exe),
+                 '--input',  test_file,
+                 '--output', test_file + '.cmp',
+                 '--mode',   'c',
+                 '--method', method]
+
+    command_compress = Command(cmpr_args)
+    cmpr_err_code = command_compress.run(timeout, cwd=testdir)
+
+    if cmpr_err_code == 'OK':
+        # [RE2, TL2]
+        dcmp_args = [os.path.abspath(exe),
+                     '--input',  test_file + '.cmp',
+                     '--output', test_file + '.dcm',
+                     '--mode',   'd',
+                     '--method', method]
+
+        command_decompress = Command(dcmp_args)
+        dcmp_err_code = command_decompress.run(timeout, cwd=testdir)
+
+        if dcmp_err_code == 'OK':
+            size_after = os.path.getsize(os.path.join(testdir, test_file + '.cmp'))
+
+            # [OK, WA]
+            if conclusion is None:
+                if filecmp.cmp(os.path.join(testdir, test_file),
+                               os.path.join(testdir, test_file + '.dcm'),
+                               shallow=False):
+                    conclusion = 'OK'
+                else:
+                    conclusion = 'WA'
+
+            os.remove(os.path.join(testdir, test_file + '.cmp'))
+            os.remove(os.path.join(testdir, test_file + '.dcm'))
+
+        else:
+            if os.path.isfile(os.path.join(testdir, test_file + '.cmp')):
+                os.remove(os.path.join(testdir, test_file + '.cmp'))
+
+            if os.path.isfile(os.path.join(testdir, test_file + '.dcm')):
+                os.remove(os.path.join(testdir, test_file + '.dcm'))
+
+            size_after = '-'
+            conclusion = dcmp_err_code + '2'
+
+    else:
+        if os.path.isfile(os.path.join(testdir, test_file + '.cmp')):
+            os.remove(os.path.join(testdir, test_file + '.cmp'))
+
+        size_after = '-'
+        conclusion = cmpr_err_code + '1'
+
+    return {'file': test_file,
+            'size': size_before,
+            'compressed': size_after,
+            'conclusion': conclusion}
+
 
 def run_tests(methods, exe, testdir, timeout=180.0):
     res = defaultdict(list)
@@ -59,67 +123,11 @@ def run_tests(methods, exe, testdir, timeout=180.0):
         for test_file in sorted(os.listdir(testdir)):
             path = os.path.join(testdir, test_file)
             if os.path.isfile(path):
-                conclusion = None
-
-                size_before = os.path.getsize(os.path.join(testdir, test_file))
-
-                # [RE1, TL1]
-                cmpr_args = [os.path.abspath(exe),
-                             '--input',  test_file,
-                             '--output', test_file + '.cmp', 
-                             '--mode',   'c',
-                             '--method', method]
-
-                command_compress = Command(cmpr_args)
-                cmpr_err_code = command_compress.run(timeout, cwd=testdir)
-
-                if cmpr_err_code == 'OK':
-                    # [RE2, TL2]
-                    dcmp_args = [os.path.abspath(exe),
-                                 '--input',  test_file + '.cmp',
-                                 '--output', test_file + '.dcm', 
-                                 '--mode',   'd',
-                                 '--method', method]
-
-                    command_decompress = Command(dcmp_args)
-                    dcmp_err_code = command_decompress.run(timeout, cwd=testdir)
-
-                    if dcmp_err_code == 'OK':
-                        size_after = os.path.getsize(os.path.join(testdir, test_file + '.cmp'))
-
-                        # [OK, WA]
-                        if conclusion is None:
-                            if filecmp.cmp(os.path.join(testdir, test_file),
-                                           os.path.join(testdir, test_file + '.dcm'),
-                                           shallow=False):
-                                conclusion = 'OK'
-                            else:
-                                conclusion = 'WA'
-
-                        os.remove(os.path.join(testdir, test_file + '.cmp'))
-                        os.remove(os.path.join(testdir, test_file + '.dcm'))
-
-                    else:
-                        if os.path.isfile(os.path.join(testdir, test_file + '.cmp')):
-                            os.remove(os.path.join(testdir, test_file + '.cmp'))
-
-                        if os.path.isfile(os.path.join(testdir, test_file + '.dcm')):
-                            os.remove(os.path.join(testdir, test_file + '.dcm'))
-
-                        size_after = '-'
-                        conclusion = dcmp_err_code + '2'
-
-                else:
-                    if os.path.isfile(os.path.join(testdir, test_file + '.cmp')):
-                        os.remove(os.path.join(testdir, test_file + '.cmp'))
-
-                    size_after = '-'
-                    conclusion = cmpr_err_code + '1'
-
-                res[method].append({'file': test_file,
-                                    'size': size_before,
-                                    'compressed': size_after,
-                                    'conclusion': conclusion})
+                res[method].append(run_test(exe=exe,
+                                            testdir=testdir,
+                                            timeout=timeout,
+                                            test_file=test_file,
+                                            method=method))
     return res
 
 
