@@ -4,12 +4,13 @@ import subprocess
 import filecmp
 import platform
 import argparse
+import json
 
-from json import load
 
 TIME_LIMIT = 'time_limit'
 RUNTIME_ERROR = 'runtime_error'
 OK = 'ok'
+
 
 class Command(object):
     def __init__(self, args):
@@ -38,14 +39,15 @@ class Command(object):
         else:
             return RUNTIME_ERROR
 
-
 def read_config(filename='config.cfg'):
     if not os.path.isfile(filename):
         methods = ['ari']
     else:
-        methods = load(open(filename))
-        for i in range(len(methods)):
-            methods[i] = methods[i].lower()
+        with open(filename, 'r') as f:
+            methods = json.load(f)
+        assert type(methods) == list
+        assert all(type(method) == str for method in methods)
+        methods = [method.lower() for method in methods]
 
     return methods
 
