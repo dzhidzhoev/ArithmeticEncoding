@@ -1,3 +1,4 @@
+from collections import defaultdict
 import os
 import threading
 import subprocess
@@ -53,11 +54,11 @@ def read_config(filename='config.cfg'):
 
 
 def run_tests(methods, exe, testdir, timeout=180.0):
-    res = {}
+    res = defaultdict(list)
     for method in methods:
-        res.update({method: []})
         for test_file in sorted(os.listdir(testdir)):
-            if os.path.isfile(os.path.join(testdir, test_file)):
+            path = os.path.join(testdir, test_file)
+            if os.path.isfile(path):
                 conclusion = None
 
                 size_before = os.path.getsize(os.path.join(testdir, test_file))
