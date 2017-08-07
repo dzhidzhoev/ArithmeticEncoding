@@ -7,6 +7,9 @@ import argparse
 
 from json import load
 
+TIME_LIMIT = 'time_limit'
+RUNTIME_ERROR = 'runtime_error'
+OK = 'ok'
 
 class Command(object):
     def __init__(self, args):
@@ -28,12 +31,12 @@ class Command(object):
         if thread.is_alive():
             self.process.kill()
             thread.join()
-            return 'TL'
+            return TIME_LIMIT
 
         if self.process.returncode == 0:
-            return 'OK'
+            return OK
         else:
-            return 'RE'
+            return RUNTIME_ERROR
 
 
 def read_config(filename='config.cfg'):
