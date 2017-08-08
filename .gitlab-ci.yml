@@ -10,8 +10,8 @@ test:
     - cmake -G "Unix Makefiles" ../src
     - make
     - cd ..
-    - python3 test.py
+    - python3 tests/run.py
   artifacts:
     paths:
-        - res.csv
+        - tests/results.csv
     expire_in: 3 weeks

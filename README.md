@@ -112,7 +112,6 @@
     ```sh
     mkdir build
     cd build
-
     ```
 
 8. Теперь конфигурируем проект с помощью CMake, указав ../src как папку
@@ -144,7 +143,7 @@
 
     ```sh
     cd ..  # поднимаемся из build в папку compression
-    python test.py
+    python tests/run.py
     ```
     
     После успешного выполнения тестов в папке compression появится файл
