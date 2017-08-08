@@ -1,5 +1,7 @@
+import filecmp
 import os
 
+from tests.testing import OK, WRONG_ANSWER
 from .command import Command
 
 
@@ -10,6 +12,7 @@ class Compressor:
         self.method = method
         self.timeout = timeout
         self.test_dir = test_dir
+        self.test_path = os.path.join(self.test_dir, self.test_file)
 
     def compress(self):
         args = [self.exe_path,
@@ -34,12 +37,30 @@ class Compressor:
         return err_code
 
     def clean(self):
-        test_path = os.path.join(self.test_dir, self.test_file)
-
         # Use try-except to prevent async errors
         try:
-            os.remove(test_path + '.cmp')
-            os.remove(test_path + '.dcm')
+            os.remove(self.test_path + '.cmp')
+            os.remove(self.test_path + '.dcm')
         except FileNotFoundError:
             pass
 
+    def run_test(self):
+        cmpr_err_code = self.compress()
+        if cmpr_err_code == OK:
+            dcmp_err_code = self.decompress()
+            if dcmp_err_code == OK:
+                compressed_size = os.path.getsize(self.test_path + '.cmp')
+
+                if filecmp.cmp(self.test_path,
+                               self.test_path + '.dcm',
+                               shallow=False):
+                    return OK, compressed_size
+                return WRONG_ANSWER, compressed_size
+            return dcmp_err_code + '2', None
+        return cmpr_err_code + '1', None
+
+    def __enter__(self):
+        pass
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.clean()

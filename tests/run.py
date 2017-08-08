@@ -22,38 +22,19 @@ def read_config(filename='config.cfg'):
     return methods
 
 
-def run_test(method, exe, testdir, test_file, timeout):
-    test_path = os.path.join(testdir, test_file)
+def run_test(method, exe_path, test_dir, test_file, timeout):
+    test_path = os.path.join(test_dir, test_file)
     size_before = os.path.getsize(test_path)
 
-    c = Compressor(os.path.abspath(exe),
-                   test_file,
-                   method,
-                   timeout,
-                   testdir)
+    cmpr = Compressor(exe_path,
+                      test_file,
+                      method,
+                      timeout,
+                      test_dir)
 
-    cmpr_err_code = c.compress()
-    if cmpr_err_code == OK:
-        dcmp_err_code = c.decompress()
-        if dcmp_err_code == OK:
-            size_after = os.path.getsize(test_path + '.cmp')
-
-            if filecmp.cmp(test_path,
-                           test_path + '.dcm',
-                           shallow=False):
-                conclusion = OK
-            else:
-                conclusion = WRONG_ANSWER
-
-        else:
-            size_after = None
-            conclusion = dcmp_err_code + '2'
-
-    else:
-        size_after = None
-        conclusion = cmpr_err_code + '1'
-
-    c.clean()
+    # Use context manager to clean up files
+    with cmpr:
+        conclusion, size_after = cmpr.run_test()
 
     return {'file': test_file,
             'size': size_before,
@@ -61,14 +42,14 @@ def run_test(method, exe, testdir, test_file, timeout):
             'conclusion': conclusion}
 
 
-def run_tests(methods, exe, testdir, timeout=180.0):
+def run_tests(methods, exe_path, test_dir, timeout=180.0):
     res = defaultdict(list)
     for method in methods:
-        for test_file in sorted(os.listdir(testdir)):
-            path = os.path.join(testdir, test_file)
+        for test_file in sorted(os.listdir(test_dir)):
+            path = os.path.join(test_dir, test_file)
             if os.path.isfile(path):
-                res[method].append(run_test(exe=exe,
-                                            testdir=testdir,
+                res[method].append(run_test(exe_path=exe_path,
+                                            test_dir=test_dir,
                                             timeout=timeout,
                                             test_file=test_file,
                                             method=method))
@@ -100,5 +81,8 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     methods = read_config()
-    res = run_tests(methods, exe=cmp_exe, testdir=args.testdir, timeout=args.timeout)
+    res = run_tests(methods,
+                    exe_path=os.path.abspath(cmp_exe),
+                    test_dir=args.testdir,
+                    timeout=args.timeout)
     save_results(res)
