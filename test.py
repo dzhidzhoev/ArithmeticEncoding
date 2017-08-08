@@ -55,8 +55,8 @@ def read_config(filename='config.cfg'):
 
 def run_test(method, exe, testdir, test_file, timeout):
     conclusion = None
-
-    size_before = os.path.getsize(os.path.join(testdir, test_file))
+    test_path = os.path.join(testdir, test_file)
+    size_before = os.path.getsize(test_path)
 
     # [RE1, TL1]
     cmpr_args = [os.path.abspath(exe),
@@ -68,7 +68,7 @@ def run_test(method, exe, testdir, test_file, timeout):
     command_compress = Command(cmpr_args)
     cmpr_err_code = command_compress.run(timeout, cwd=testdir)
 
-    if cmpr_err_code == 'OK':
+    if cmpr_err_code == OK:
         # [RE2, TL2]
         dcmp_args = [os.path.abspath(exe),
                      '--input',  test_file + '.cmp',
@@ -79,34 +79,34 @@ def run_test(method, exe, testdir, test_file, timeout):
         command_decompress = Command(dcmp_args)
         dcmp_err_code = command_decompress.run(timeout, cwd=testdir)
 
-        if dcmp_err_code == 'OK':
-            size_after = os.path.getsize(os.path.join(testdir, test_file + '.cmp'))
+        if dcmp_err_code == OK:
+            size_after = os.path.getsize(test_path + '.cmp')
 
             # [OK, WA]
             if conclusion is None:
-                if filecmp.cmp(os.path.join(testdir, test_file),
-                               os.path.join(testdir, test_file + '.dcm'),
+                if filecmp.cmp(test_path,
+                               test_path + '.dcm',
                                shallow=False):
-                    conclusion = 'OK'
+                    conclusion = OK
                 else:
-                    conclusion = 'WA'
+                    conclusion = WRONG_ANSWER
 
-            os.remove(os.path.join(testdir, test_file + '.cmp'))
-            os.remove(os.path.join(testdir, test_file + '.dcm'))
+            os.remove(test_path + '.cmp')
+            os.remove(test_path + '.dcm')
 
         else:
-            if os.path.isfile(os.path.join(testdir, test_file + '.cmp')):
-                os.remove(os.path.join(testdir, test_file + '.cmp'))
+            if os.path.isfile(test_path + '.cmp'):
+                os.remove(test_path + '.cmp')
 
-            if os.path.isfile(os.path.join(testdir, test_file + '.dcm')):
-                os.remove(os.path.join(testdir, test_file + '.dcm'))
+            if os.path.isfile(test_path + '.dcm'):
+                os.remove(test_path + '.dcm')
 
             size_after = '-'
             conclusion = dcmp_err_code + '2'
 
     else:
-        if os.path.isfile(os.path.join(testdir, test_file + '.cmp')):
-            os.remove(os.path.join(testdir, test_file + '.cmp'))
+        if os.path.isfile(test_path + '.cmp'):
+            os.remove(test_path + '.cmp')
 
         size_after = '-'
         conclusion = cmpr_err_code + '1'
