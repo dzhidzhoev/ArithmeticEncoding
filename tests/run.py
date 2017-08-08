@@ -1,5 +1,4 @@
 import csv
-from collections import defaultdict
 import os
 import platform
 import argparse
@@ -25,6 +24,7 @@ DIR_BUILD = os.path.join(DIR_PROJECT, 'build')
 def read_config(filename=FILE_CONFIG):
     if not os.path.isfile(filename):
         methods = ['ari']
+        print('Failed to find config file: {}'.format(filename))
     else:
         with open(filename, 'r') as f:
             methods = json.load(f)
@@ -86,22 +86,28 @@ def save_results(results, filename=FILE_RESULTS):
             writer.writerow([row[column] for column in header])
 
 
-if __name__ == '__main__':
+def main():
     parser = argparse.ArgumentParser(description='Testing script', prog='test')
     parser.add_argument('--timeout', type=float, default=180.0)
     parser.add_argument('--testdir', type=str, default=DIR_TEST_FILES)
 
-    if platform.system() == 'Windows':
-        cmp_exe = os.path.join(DIR_BUILD, 'compress.exe')
-    else:
-        cmp_exe = os.path.join(DIR_BUILD, 'compress')
+    cmp_exe = 'compress.exe' if platform.system() == 'Windows' else 'compress'
+    exe_path = os.path.join(DIR_BUILD, cmp_exe)
+    print('Executable: {}'.format(exe_path))
 
     args = parser.parse_args()
 
     methods = read_config()
+    print('Methods to test: {}'.format(methods))
+    print()
+
     results = run_tests(methods,
-                        exe_path=os.path.abspath(cmp_exe),
+                        exe_path=exe_path,
                         test_dir=args.testdir,
                         timeout=args.timeout)
     save_results(results,
                  filename=FILE_RESULTS)
+
+
+if __name__ == '__main__':
+    main()
