@@ -13,8 +13,16 @@ ORIGINAL_SIZE = 'original_size'
 COMPRESSED_SIZE = 'compressed_size'
 CONCLUSION = 'conclusion'
 
+DIR_TESTS = os.path.split(os.path.abspath(__file__))[0]
+DIR_TEST_FILES = os.path.join(DIR_TESTS, 'test_files')
+FILE_RESULTS = os.path.join(DIR_TESTS, 'results.csv')
+FILE_CONFIG = os.path.join(DIR_TESTS, 'config.cfg')
 
-def read_config(filename='config.cfg'):
+DIR_PROJECT = os.path.normpath(os.path.join(DIR_TESTS, os.path.pardir))
+DIR_BUILD = os.path.join(DIR_PROJECT, 'build')
+
+
+def read_config(filename=FILE_CONFIG):
     if not os.path.isfile(filename):
         methods = ['ari']
     else:
@@ -65,7 +73,7 @@ def run_tests(methods, exe_path, test_dir, timeout=180.0):
     return results
 
 
-def save_results(results, filename='res.csv'):
+def save_results(results, filename=FILE_RESULTS):
     header = [METHOD,
               FILE,
               ORIGINAL_SIZE,
@@ -81,18 +89,19 @@ def save_results(results, filename='res.csv'):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Testing script', prog='test')
     parser.add_argument('--timeout', type=float, default=180.0)
-    parser.add_argument('--testdir', type=str, default='./tests')
+    parser.add_argument('--testdir', type=str, default=DIR_TEST_FILES)
 
     if platform.system() == 'Windows':
-        cmp_exe = './build/compress.exe'
+        cmp_exe = os.path.join(DIR_BUILD, 'compress.exe')
     else:
-        cmp_exe = './build/compress'
+        cmp_exe = os.path.join(DIR_BUILD, 'compress')
 
     args = parser.parse_args()
 
     methods = read_config()
-    res = run_tests(methods,
-                    exe_path=os.path.abspath(cmp_exe),
-                    test_dir=args.testdir,
-                    timeout=args.timeout)
-    save_results(res)
+    results = run_tests(methods,
+                        exe_path=os.path.abspath(cmp_exe),
+                        test_dir=args.testdir,
+                        timeout=args.timeout)
+    save_results(results,
+                 filename=FILE_RESULTS)
