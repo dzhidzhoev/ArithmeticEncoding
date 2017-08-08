@@ -5,6 +5,8 @@ import platform
 import argparse
 import json
 
+from tests.testing.compressor import Compressor
+
 
 def read_config(filename='config.cfg'):
     if not os.path.isfile(filename):
@@ -24,17 +26,14 @@ def run_test(method, exe, testdir, test_file, timeout):
     test_path = os.path.join(testdir, test_file)
     size_before = os.path.getsize(test_path)
 
+    c = Compressor(os.path.abspath(exe),
+                   test_file,
+                   method,
+                   timeout,
+                   testdir)
+
     # [RE1, TL1]
-    cmpr_args = [os.path.abspath(exe),
-                 '--input',  test_file,
-                 '--output', test_file + '.cmp',
-                 '--mode',   'c',
-                 '--method', method]
-
-    command_compress = Command(cmpr_args)
-    cmpr_err_code = command_compress.run(timeout, cwd=testdir)
-
-    if cmpr_err_code == OK:
+    if c.compress() == OK:
         # [RE2, TL2]
         dcmp_args = [os.path.abspath(exe),
                      '--input',  test_file + '.cmp',

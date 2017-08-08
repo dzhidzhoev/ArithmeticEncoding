@@ -19,4 +19,14 @@ class Compressor:
         cmd = Command(args)
         err_code = cmd.run(self.timeout, cwd=self.test_dir)
         return err_code
-    
+
+    def decompress(self):
+        args = [self.exe_path,
+                '--input', self.test_file + '.cmp',
+                '--output', self.test_file + '.dcm',
+                '--mode', 'd',
+                '--method', self.method]
+
+        cmd = Command(args)
+        err_code = cmd.run(self.timeout, cwd=self.test_dir)
+        return err_code
