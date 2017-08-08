@@ -1,3 +1,5 @@
+import os
+
 from .command import Command
 
 
@@ -30,3 +32,14 @@ class Compressor:
         cmd = Command(args)
         err_code = cmd.run(self.timeout, cwd=self.test_dir)
         return err_code
+
+    def clean(self):
+        test_path = os.path.join(self.test_dir, self.test_file)
+
+        # Use try-except to prevent async errors
+        try:
+            os.remove(test_path + '.cmp')
+            os.remove(test_path + '.dcm')
+        except FileNotFoundError:
+            pass
+

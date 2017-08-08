@@ -23,7 +23,6 @@ def read_config(filename='config.cfg'):
 
 
 def run_test(method, exe, testdir, test_file, timeout):
-    conclusion = None
     test_path = os.path.join(testdir, test_file)
     size_before = os.path.getsize(test_path)
 
@@ -33,10 +32,8 @@ def run_test(method, exe, testdir, test_file, timeout):
                    timeout,
                    testdir)
 
-    # [RE1, TL1]
     cmpr_err_code = c.compress()
     if cmpr_err_code == OK:
-        # [RE2, TL2]
         dcmp_err_code = c.decompress()
         if dcmp_err_code == OK:
             size_after = os.path.getsize(test_path + '.cmp')
@@ -49,23 +46,14 @@ def run_test(method, exe, testdir, test_file, timeout):
                 conclusion = WRONG_ANSWER
 
         else:
-            if os.path.isfile(test_path + '.cmp'):
-                os.remove(test_path + '.cmp')
-
-            if os.path.isfile(test_path + '.dcm'):
-                os.remove(test_path + '.dcm')
-
-            size_after = '-'
+            size_after = None
             conclusion = dcmp_err_code + '2'
 
     else:
-        if os.path.isfile(test_path + '.cmp'):
-            os.remove(test_path + '.cmp')
-
-        size_after = '-'
+        size_after = None
         conclusion = cmpr_err_code + '1'
 
-    
+    c.clean()
 
     return {'file': test_file,
             'size': size_before,
