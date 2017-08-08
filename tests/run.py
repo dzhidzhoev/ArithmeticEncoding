@@ -4,7 +4,7 @@ import platform
 import argparse
 import json
 
-from tests.testing.compressor import Compressor
+from testing import Compressor
 
 METHOD = 'method'
 FILE = 'file'

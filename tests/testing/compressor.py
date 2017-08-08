@@ -1,7 +1,7 @@
 import filecmp
 import os
 
-from tests.testing import OK, WRONG_ANSWER
+from . import OK, WRONG_ANSWER
 from .command import Command
 
 
