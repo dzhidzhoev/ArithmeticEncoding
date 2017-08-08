@@ -5,16 +5,16 @@ import subprocess
 import filecmp
 import platform
 import argparse
-import logging
 import json
 
 
 TIME_LIMIT = 'TL'
 RUNTIME_ERROR = 'RE'
 OK = 'OK'
+WRONG_ANSWER = 'WA'
 
 
-class Command(object):
+class Command:
     def __init__(self, args):
         self.args = args
         self.process = None
@@ -41,6 +41,12 @@ class Command(object):
         else:
             return RUNTIME_ERROR
 
+
+class Compressor:
+    def __init__(self):
+        pass
+
+
 def read_config(filename='config.cfg'):
     if not os.path.isfile(filename):
         methods = ['ari']
@@ -52,6 +58,7 @@ def read_config(filename='config.cfg'):
         methods = [method.lower() for method in methods]
 
     return methods
+
 
 def run_test(method, exe, testdir, test_file, timeout):
     conclusion = None
