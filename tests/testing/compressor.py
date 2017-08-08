@@ -45,19 +45,21 @@ class Compressor:
             pass
 
     def run_test(self):
-        cmpr_err_code = self.compress()
-        if cmpr_err_code == OK:
-            dcmp_err_code = self.decompress()
-            if dcmp_err_code == OK:
-                compressed_size = os.path.getsize(self.test_path + '.cmp')
+        err_code = self.compress()
+        if err_code != OK:
+            return err_code + '1', None
 
-                if filecmp.cmp(self.test_path,
-                               self.test_path + '.dcm',
-                               shallow=False):
-                    return OK, compressed_size
-                return WRONG_ANSWER, compressed_size
-            return dcmp_err_code + '2', None
-        return cmpr_err_code + '1', None
+        err_code = self.decompress()
+        if err_code != OK:
+            return err_code + '2', None
+
+        compressed_size = os.path.getsize(self.test_path + '.cmp')
+
+        if filecmp.cmp(self.test_path,
+                       self.test_path + '.dcm',
+                       shallow=False):
+            return OK, compressed_size
+        return WRONG_ANSWER, compressed_size
 
     def __enter__(self):
         pass
