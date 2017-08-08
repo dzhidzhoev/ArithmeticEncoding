@@ -5,6 +5,7 @@ import platform
 import argparse
 import json
 
+from tests.testing import OK, WRONG_ANSWER
 from tests.testing.compressor import Compressor
 
 
@@ -33,31 +34,19 @@ def run_test(method, exe, testdir, test_file, timeout):
                    testdir)
 
     # [RE1, TL1]
-    if c.compress() == OK:
+    cmpr_err_code = c.compress()
+    if cmpr_err_code == OK:
         # [RE2, TL2]
-        dcmp_args = [os.path.abspath(exe),
-                     '--input',  test_file + '.cmp',
-                     '--output', test_file + '.dcm',
-                     '--mode',   'd',
-                     '--method', method]
-
-        command_decompress = Command(dcmp_args)
-        dcmp_err_code = command_decompress.run(timeout, cwd=testdir)
-
+        dcmp_err_code = c.decompress()
         if dcmp_err_code == OK:
             size_after = os.path.getsize(test_path + '.cmp')
 
-            # [OK, WA]
-            if conclusion is None:
-                if filecmp.cmp(test_path,
-                               test_path + '.dcm',
-                               shallow=False):
-                    conclusion = OK
-                else:
-                    conclusion = WRONG_ANSWER
-
-            os.remove(test_path + '.cmp')
-            os.remove(test_path + '.dcm')
+            if filecmp.cmp(test_path,
+                           test_path + '.dcm',
+                           shallow=False):
+                conclusion = OK
+            else:
+                conclusion = WRONG_ANSWER
 
         else:
             if os.path.isfile(test_path + '.cmp'):
@@ -75,6 +64,8 @@ def run_test(method, exe, testdir, test_file, timeout):
 
         size_after = '-'
         conclusion = cmpr_err_code + '1'
+
+    
 
     return {'file': test_file,
             'size': size_before,
