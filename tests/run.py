@@ -6,11 +6,6 @@ import argparse
 import json
 
 
-class Compressor:
-    def __init__(self):
-        pass
-
-
 def read_config(filename='config.cfg'):
     if not os.path.isfile(filename):
         methods = ['ari']
