@@ -6,13 +6,14 @@ from .command import Command
 
 
 class Compressor:
-    def __init__(self, exe_path, test_file, method, timeout, test_dir):
+    def __init__(self, exe_path, test_file, method, timeout, test_dir, output_dir):
         self.exe_path = exe_path
         self.test_file = test_file
         self.method = method
         self.timeout = timeout
         self.test_dir = test_dir
         self.test_path = os.path.join(self.test_dir, self.test_file)
+        self.output_dir = output_dir
 
     def compress(self):
         args = [self.exe_path,

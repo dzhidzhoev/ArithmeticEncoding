@@ -14,6 +14,7 @@ CONCLUSION = 'conclusion'
 
 DIR_TESTS = os.path.split(os.path.abspath(__file__))[0]
 DIR_TEST_FILES = os.path.join(DIR_TESTS, 'test_files')
+DIR_TEST_OUTPUT = os.path.join(DIR_TESTS, 'output')
 FILE_RESULTS = os.path.join(DIR_TESTS, 'results.csv')
 FILE_CONFIG = os.path.join(DIR_TESTS, 'config.cfg')
 
@@ -35,7 +36,7 @@ def read_config(filename=FILE_CONFIG):
     return methods
 
 
-def run_test(method, exe_path, test_dir, test_file, timeout):
+def run_test(method, exe_path, test_dir, test_file, timeout, output_dir):
     test_path = os.path.join(test_dir, test_file)
     original_size = os.path.getsize(test_path)
 
@@ -43,7 +44,8 @@ def run_test(method, exe_path, test_dir, test_file, timeout):
                       test_file,
                       method,
                       timeout,
-                      test_dir)
+                      test_dir,
+                      output_dir)
 
     # Use context manager to clean up files
     with cmpr:
@@ -54,9 +56,16 @@ def run_test(method, exe_path, test_dir, test_file, timeout):
             CONCLUSION: conclusion}
 
 
-def run_tests(methods, exe_path, test_dir, timeout=180.0):
+def run_tests(methods, exe_path, test_dir, output_dir, timeout=180.0):
     results = []
+    if not os.path.exists(test_dir):
+        os.mkdir(test_dir)
+
     for method in methods:
+        method_dir = os.path.join(test_dir, method)
+        if not os.path.exists(method_dir):
+            os.mkdir(method_dir)
+
         for test_file in sorted(os.listdir(test_dir)):
             path = os.path.join(test_dir, test_file)
             if not os.path.isfile(path):
@@ -66,6 +75,7 @@ def run_tests(methods, exe_path, test_dir, timeout=180.0):
                                     test_dir=test_dir,
                                     timeout=timeout,
                                     test_file=test_file,
+                                    output_dir=output_dir,
                                     method=method)
             test_results.update({METHOD: method,
                                  FILE: test_file})
@@ -90,6 +100,7 @@ def main():
     parser = argparse.ArgumentParser(description='Testing script', prog='test')
     parser.add_argument('--timeout', type=float, default=180.0)
     parser.add_argument('--testdir', type=str, default=DIR_TEST_FILES)
+    parser.add_argument('--outputdir', type=str, default=DIR_TEST_OUTPUT)
 
     cmp_exe = 'compress.exe' if platform.system() == 'Windows' else 'compress'
     exe_path = os.path.join(DIR_BUILD, cmp_exe)
@@ -105,6 +116,7 @@ def main():
         results = run_tests(methods,
                             exe_path=exe_path,
                             test_dir=args.testdir,
+                            output_dir=args.outputdir,
                             timeout=args.timeout)
     except ExecutableNotFoundError as e:
         print('Failed to find executable')
