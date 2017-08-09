@@ -6,7 +6,7 @@ from .command import Command
 
 
 class Compressor:
-    def __init__(self, exe_path, test_file, method, timeout, test_dir, output_dir):
+    def __init__(self, *, exe_path, test_file, method, timeout, test_dir, output_dir):
         self.exe_path = exe_path
         self.test_file = test_file
         self.method = method
@@ -22,8 +22,14 @@ class Compressor:
                 '--mode', 'c',
                 '--method', self.method]
 
+        compress_dir = os.path.join(self.output_dir, 'compress')
+        if not os.path.exists(compress_dir):
+            os.mkdir(compress_dir)
+
         cmd = Command(args)
-        err_code = cmd.run(self.timeout, working_directory=self.test_dir)
+        err_code = cmd.run(output_file=os.path.join(compress_dir, self.test_file),
+                           timeout=self.timeout,
+                           working_directory=self.test_dir)
         return err_code
 
     def decompress(self):
@@ -33,8 +39,14 @@ class Compressor:
                 '--mode', 'd',
                 '--method', self.method]
 
+        decompress_dir = os.path.join(self.output_dir, 'decompress')
+        if not os.path.exists(decompress_dir):
+            os.mkdir(decompress_dir)
+
         cmd = Command(args)
-        err_code = cmd.run(self.timeout, working_directory=self.test_dir)
+        err_code = cmd.run(output_file=os.path.join(decompress_dir, self.test_file),
+                           timeout=self.timeout,
+                           working_directory=self.test_dir)
         return err_code
 
     def clean(self):

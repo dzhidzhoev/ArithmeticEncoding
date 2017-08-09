@@ -14,21 +14,31 @@ class Command:
         self.return_code = None
         self.process = None
 
-    def run(self, timeout, working_directory):
+    def run(self, output_file, *, timeout, working_directory):
+        with open(output_file, 'w') as f:
+            return self._run(f, timeout, working_directory)
+
+    def _run(self, file_obj, timeout, working_directory):
         try:
             process = subprocess.Popen(self.args,
                                        cwd=working_directory,
-                                       stdout=subprocess.DEVNULL,
-                                       stderr=subprocess.DEVNULL)
+                                       stdout=file_obj,
+                                       stderr=file_obj)
         except FileNotFoundError as e:
             raise ExecutableNotFoundError(str(e))
         except OSError as e:
             raise e
 
+        #
+        # communicate() example
+        # https://docs.python.org/3/library/subprocess.html#subprocess.Popen.communicate
+        #
+
         try:
-            output = process.communicate(timeout=timeout)
-        except subprocess.TimeoutExpired as e:
+            process.communicate(timeout=timeout)
+        except subprocess.TimeoutExpired:
             process.kill()
+            process.communicate()
             return TIME_LIMIT
 
         if process.returncode == 0:

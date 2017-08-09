@@ -22,6 +22,10 @@ DIR_PROJECT = os.path.normpath(os.path.join(DIR_TESTS, os.path.pardir))
 DIR_BUILD = os.path.join(DIR_PROJECT, 'build')
 
 
+class TestDirectoryNotFoundError(FileNotFoundError):
+    pass
+
+
 def read_config(filename=FILE_CONFIG):
     if not os.path.isfile(filename):
         methods = ['ari']
@@ -36,16 +40,16 @@ def read_config(filename=FILE_CONFIG):
     return methods
 
 
-def run_test(method, exe_path, test_dir, test_file, timeout, output_dir):
+def run_test(*, method, exe_path, test_dir, test_file, timeout, output_dir):
     test_path = os.path.join(test_dir, test_file)
     original_size = os.path.getsize(test_path)
 
-    cmpr = Compressor(exe_path,
-                      test_file,
-                      method,
-                      timeout,
-                      test_dir,
-                      output_dir)
+    cmpr = Compressor(exe_path=exe_path,
+                      test_file=test_file,
+                      method=method,
+                      timeout=timeout,
+                      test_dir=test_dir,
+                      output_dir=output_dir)
 
     # Use context manager to clean up files
     with cmpr:
@@ -58,24 +62,27 @@ def run_test(method, exe_path, test_dir, test_file, timeout, output_dir):
 
 def run_tests(methods, exe_path, test_dir, output_dir, timeout=180.0):
     results = []
-    if not os.path.exists(test_dir):
-        os.mkdir(test_dir)
+    if not os.path.isdir(test_dir):
+        raise TestDirectoryNotFoundError('Failed to find {}'.format(test_dir))
+
+    if not os.path.exists(output_dir):
+        os.mkdir(output_dir)
 
     for method in methods:
-        method_dir = os.path.join(test_dir, method)
+        method_dir = os.path.join(output_dir, method)
         if not os.path.exists(method_dir):
             os.mkdir(method_dir)
 
         for test_file in sorted(os.listdir(test_dir)):
-            path = os.path.join(test_dir, test_file)
-            if not os.path.isfile(path):
+            test_path = os.path.join(test_dir, test_file)
+            if not os.path.isfile(test_path):
                 continue
 
             test_results = run_test(exe_path=exe_path,
                                     test_dir=test_dir,
                                     timeout=timeout,
                                     test_file=test_file,
-                                    output_dir=output_dir,
+                                    output_dir=method_dir,
                                     method=method)
             test_results.update({METHOD: method,
                                  FILE: test_file})
@@ -110,7 +117,6 @@ def main():
 
     methods = read_config()
     print('Methods to test: {}'.format(methods))
-    print()
 
     try:
         results = run_tests(methods,
@@ -122,9 +128,13 @@ def main():
         print('Failed to find executable')
         print(e)
         return
+    except TestDirectoryNotFoundError as e:
+        print('Failed to find test directory')
+        print(e)
+        return
 
     save_results(results, filename=FILE_RESULTS)
-
+    print('Results saved to: {}'.format(FILE_RESULTS))
 
 if __name__ == '__main__':
     main()
