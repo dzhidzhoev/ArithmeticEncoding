@@ -4,7 +4,7 @@ import platform
 import argparse
 import json
 
-from testing import Compressor
+from testing import Compressor, ExecutableNotFoundError
 
 METHOD = 'method'
 FILE = 'file'
@@ -101,12 +101,17 @@ def main():
     print('Methods to test: {}'.format(methods))
     print()
 
-    results = run_tests(methods,
-                        exe_path=exe_path,
-                        test_dir=args.testdir,
-                        timeout=args.timeout)
-    save_results(results,
-                 filename=FILE_RESULTS)
+    try:
+        results = run_tests(methods,
+                            exe_path=exe_path,
+                            test_dir=args.testdir,
+                            timeout=args.timeout)
+    except ExecutableNotFoundError as e:
+        print('Failed to find executable')
+        print(e)
+        return
+
+    save_results(results, filename=FILE_RESULTS)
 
 
 if __name__ == '__main__':
