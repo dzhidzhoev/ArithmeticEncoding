@@ -111,7 +111,7 @@ def main():
     parser.add_argument('--timeout', type=float, default=180.0)
     parser.add_argument('--testdir', type=str, default=DIR_TEST_FILES)
 
-    parser.add_argument('--outputdir', type=str, default=DIR_TEST_OUTPUT)
+    parser.add_argument('--outputdir', type=str, default='')
     parser.add_argument('--output', action='store_true')
 
     cmp_exe = 'compress.exe' if platform.system() == 'Windows' else 'compress'
@@ -119,6 +119,10 @@ def main():
     print('Executable: {}'.format(exe_path))
 
     args = parser.parse_args()
+    if not args.outputdir:
+        args.outputdir = DIR_TEST_OUTPUT
+    else:
+        args.output = True
 
     methods = read_config()
     print('Methods to test: {}'.format(methods))
