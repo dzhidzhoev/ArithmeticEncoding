@@ -65,13 +65,16 @@ def run_tests(methods, exe_path, test_dir, output_dir, timeout=180.0):
     if not os.path.isdir(test_dir):
         raise TestDirectoryNotFoundError('Failed to find {}'.format(test_dir))
 
-    if not os.path.exists(output_dir):
+    if output_dir and not os.path.exists(output_dir):
         os.mkdir(output_dir)
 
     for method in methods:
-        method_dir = os.path.join(output_dir, method)
-        if not os.path.exists(method_dir):
-            os.mkdir(method_dir)
+        if output_dir:
+            method_dir = os.path.join(output_dir, method)
+            if not os.path.exists(method_dir):
+                os.mkdir(method_dir)
+        else:
+            method_dir = None
 
         for test_file in sorted(os.listdir(test_dir)):
             test_path = os.path.join(test_dir, test_file)
@@ -107,7 +110,9 @@ def main():
     parser = argparse.ArgumentParser(description='Testing script', prog='test')
     parser.add_argument('--timeout', type=float, default=180.0)
     parser.add_argument('--testdir', type=str, default=DIR_TEST_FILES)
+
     parser.add_argument('--outputdir', type=str, default=DIR_TEST_OUTPUT)
+    parser.add_argument('--output', action='store_true')
 
     cmp_exe = 'compress.exe' if platform.system() == 'Windows' else 'compress'
     exe_path = os.path.join(DIR_BUILD, cmp_exe)
@@ -122,7 +127,7 @@ def main():
         results = run_tests(methods,
                             exe_path=exe_path,
                             test_dir=args.testdir,
-                            output_dir=args.outputdir,
+                            output_dir=args.outputdir if args.output else None,
                             timeout=args.timeout)
     except ExecutableNotFoundError as e:
         print('Failed to find executable')

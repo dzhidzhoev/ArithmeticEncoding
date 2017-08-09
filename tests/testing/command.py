@@ -15,6 +15,9 @@ class Command:
         self.process = None
 
     def run(self, output_file, *, timeout, working_directory):
+        if output_file is None:
+            return self._run(subprocess.DEVNULL, timeout, working_directory)
+
         with open(output_file, 'w') as f:
             return self._run(f, timeout, working_directory)
 

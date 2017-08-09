@@ -22,12 +22,8 @@ class Compressor:
                 '--mode', 'c',
                 '--method', self.method]
 
-        compress_dir = os.path.join(self.output_dir, 'compress')
-        if not os.path.exists(compress_dir):
-            os.mkdir(compress_dir)
-
         cmd = Command(args)
-        err_code = cmd.run(output_file=os.path.join(compress_dir, self.test_file),
+        err_code = cmd.run(output_file=self.output_filename('compress'),
                            timeout=self.timeout,
                            working_directory=self.test_dir)
         return err_code
@@ -39,15 +35,20 @@ class Compressor:
                 '--mode', 'd',
                 '--method', self.method]
 
-        decompress_dir = os.path.join(self.output_dir, 'decompress')
-        if not os.path.exists(decompress_dir):
-            os.mkdir(decompress_dir)
-
         cmd = Command(args)
-        err_code = cmd.run(output_file=os.path.join(decompress_dir, self.test_file),
+        err_code = cmd.run(output_file=self.output_filename('decompress'),
                            timeout=self.timeout,
                            working_directory=self.test_dir)
         return err_code
+
+    def output_filename(self, mode):
+        if self.output_dir:
+            decompress_dir = os.path.join(self.output_dir, mode)
+            if not os.path.exists(decompress_dir):
+                os.mkdir(decompress_dir)
+            return os.path.join(decompress_dir, self.test_file)
+        else:
+            return None
 
     def clean(self):
         # Use try-except to prevent async errors
