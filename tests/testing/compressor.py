@@ -15,31 +15,30 @@ class Compressor:
         self.test_path = os.path.join(self.test_dir, self.test_file)
         self.output_dir = output_dir
 
-    def compress(self):
+    def execute(self, input_f, output_f, mode, name):
         args = [self.exe_path,
-                '--input', self.test_file,
-                '--output', self.test_file + '.cmp',
-                '--mode', 'c',
+                '--input', input_f,
+                '--output', output_f,
+                '--mode', mode,
                 '--method', self.method]
 
         cmd = Command(args)
-        err_code = cmd.run(output_file=self.output_filename('compress'),
+        err_code = cmd.run(output_file=self.output_filename(name),
                            timeout=self.timeout,
                            working_directory=self.test_dir)
         return err_code
+
+    def compress(self):
+        return self.execute(input_f=self.test_file,
+                            output_f=self.test_file + '.cmp',
+                            mode='c',
+                            name='compress')
 
     def decompress(self):
-        args = [self.exe_path,
-                '--input', self.test_file + '.cmp',
-                '--output', self.test_file + '.dcm',
-                '--mode', 'd',
-                '--method', self.method]
-
-        cmd = Command(args)
-        err_code = cmd.run(output_file=self.output_filename('decompress'),
-                           timeout=self.timeout,
-                           working_directory=self.test_dir)
-        return err_code
+        return self.execute(input_f=self.test_file + '.cmp',
+                            output_f=self.test_file + '.dcm',
+                            mode='d',
+                            name='decompress')
 
     def output_filename(self, mode):
         if self.output_dir:
