@@ -305,7 +305,8 @@ git push my_cmpr master
 Вот и всё!
 
 Если вы хотите более подробно ознакомиться с Git:
-[Getting Started](https://www.atlassian.com/git/tutorials/setting-up-a-repository).
+[Getting Started](https://www.atlassian.com/git/tutorials/setting-up-a-repository),
+[Git Pro Book](https://git-scm.com/book/ru/v1).
 
 ## Описание репозитория
 * `src` — папка с исходными файлами:
