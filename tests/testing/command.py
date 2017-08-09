@@ -9,10 +9,10 @@ class Command:
         self.args = args
         self.process = None
 
-    def run(self, timeout, cwd):
+    def run(self, timeout, working_directory):
         def target():
             try:
-                self.process = subprocess.Popen(self.args, cwd=cwd)
+                self.process = subprocess.Popen(self.args, cwd=working_directory)
                 self.process.communicate()
             except OSError as e:
                 self.process.returncode = e

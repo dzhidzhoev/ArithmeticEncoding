@@ -22,7 +22,7 @@ class Compressor:
                 '--method', self.method]
 
         cmd = Command(args)
-        err_code = cmd.run(self.timeout, cwd=self.test_dir)
+        err_code = cmd.run(self.timeout, working_directory=self.test_dir)
         return err_code
 
     def decompress(self):
@@ -33,7 +33,7 @@ class Compressor:
                 '--method', self.method]
 
         cmd = Command(args)
-        err_code = cmd.run(self.timeout, cwd=self.test_dir)
+        err_code = cmd.run(self.timeout, working_directory=self.test_dir)
         return err_code
 
     def clean(self):
