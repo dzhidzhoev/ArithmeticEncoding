@@ -5,3 +5,4 @@ OK = 'OK'
 WRONG_ANSWER = 'WA'
 
 from .compressor import Compressor
+from .command import ExecutableNotFoundError
