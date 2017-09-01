@@ -6,35 +6,48 @@ from .command import Command
 
 
 class Compressor:
-    def __init__(self, exe_path, test_file, method, timeout, test_dir):
+    def __init__(self, *, exe_path, test_file, method, timeout, test_dir, output_dir):
         self.exe_path = exe_path
         self.test_file = test_file
         self.method = method
         self.timeout = timeout
         self.test_dir = test_dir
         self.test_path = os.path.join(self.test_dir, self.test_file)
+        self.output_dir = output_dir
+
+    def execute(self, input_f, output_f, mode, name):
+        args = [self.exe_path,
+                '--input', input_f,
+                '--output', output_f,
+                '--mode', mode,
+                '--method', self.method]
+
+        cmd = Command(args)
+        err_code = cmd.run(output_file=self.output_filename(name),
+                           timeout=self.timeout,
+                           working_directory=self.test_dir)
+        return err_code
 
     def compress(self):
-        args = [self.exe_path,
-                '--input', self.test_file,
-                '--output', self.test_file + '.cmp',
-                '--mode', 'c',
-                '--method', self.method]
-
-        cmd = Command(args)
-        err_code = cmd.run(self.timeout, cwd=self.test_dir)
-        return err_code
+        return self.execute(input_f=self.test_file,
+                            output_f=self.test_file + '.cmp',
+                            mode='c',
+                            name='compress')
 
     def decompress(self):
-        args = [self.exe_path,
-                '--input', self.test_file + '.cmp',
-                '--output', self.test_file + '.dcm',
-                '--mode', 'd',
-                '--method', self.method]
+        return self.execute(input_f=self.test_file + '.cmp',
+                            output_f=self.test_file + '.dcm',
+                            mode='d',
+                            name='decompress')
 
-        cmd = Command(args)
-        err_code = cmd.run(self.timeout, cwd=self.test_dir)
-        return err_code
+    def output_filename(self, mode):
+        if self.output_dir:
+            decompress_dir = os.path.join(self.output_dir, mode)
+            if not os.path.exists(decompress_dir):
+                os.mkdir(decompress_dir)
+            return os.path.join(decompress_dir, self.test_file)
+        else:
+            return None
 
     def clean(self):
         # Use try-except to prevent async errors
