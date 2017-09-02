@@ -7,4 +7,7 @@ tests:
 build-base:
 	docker build . -f Dockerfile.base -t grihabor/compressor_base
 
+push-base:
+	docker push grihabor/compressor_base
+
 .PHONY: all tests

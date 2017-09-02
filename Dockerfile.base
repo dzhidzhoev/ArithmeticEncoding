@@ -7,3 +7,15 @@ RUN apk update \
         make \
         cmake \
         g++
+
+ONBUILD ADD tests /project/tests
+ONBUILD ADD test_files /project/test_files
+ONBUILD ADD src /project/src
+
+ONBUILD RUN mkdir /project/build \
+ && cd /project/build \
+ && CMAKE_MAKE_PROGRAM=make cmake /project/src \
+ && make
+
+CMD python3 /project/tests/run.py && cat /project/tests/results.csv
+
