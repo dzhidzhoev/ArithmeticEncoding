@@ -25,7 +25,7 @@ Options\n\n\
         }
         else if (!strcmp(argv[i], "--input")) {
             if (++i < argc) {
-                opts->ifile = realloc(opts->ifile, sizeof(char) * sizeof(*(argv[i])));
+                opts->ifile = realloc(opts->ifile, sizeof(char) * (strlen(argv[i]) + 1));
                 strcpy(opts->ifile, argv[i]);
                 continue;
             }
@@ -37,7 +37,7 @@ Options\n\n\
         }
         else if (!strcmp(argv[i], "--output")) {
             if (++i < argc) {
-                opts->ofile = realloc(opts->ofile, sizeof(char) * sizeof(*(argv[i])));
+                opts->ofile = realloc(opts->ofile, sizeof(char) * (strlen(argv[i]) + 1));
                 strcpy(opts->ofile, argv[i]);
                 continue;
             }
