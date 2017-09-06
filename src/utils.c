@@ -111,13 +111,16 @@ Options\n\n\
 }
 
 CompressOptions *default_config(void) {
+    const char DEFAULT_INPUT_FILENAME[] = "input.txt";
+    const char DEFAULT_OUTPUT_FILENAME[] = "output.txt";
+
     CompressOptions *default_opts = calloc(1, sizeof(*default_opts));
 
-    default_opts->ifile = calloc(sizeof(char), 10);
-    strcpy(default_opts->ifile, "input.txt");
+    default_opts->ifile = calloc(sizeof(char), sizeof(DEFAULT_INPUT_FILENAME));
+    strcpy(default_opts->ifile, DEFAULT_INPUT_FILENAME);
 
-    default_opts->ofile = calloc(sizeof(char), 11);
-    strcpy(default_opts->ofile, "output.txt");
+    default_opts->ofile = calloc(sizeof(char), sizeof(DEFAULT_OUTPUT_FILENAME));
+    strcpy(default_opts->ofile, DEFAULT_OUTPUT_FILENAME);
 
     default_opts->mode = 'c';
     default_opts->method = ARI;
