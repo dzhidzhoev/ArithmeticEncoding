@@ -2,8 +2,7 @@ FROM library/alpine:3.6
 MAINTAINER Borodin Gregory <grihabor@mail.ru>
 
 RUN apk update \
- && apk add --no-cache \
-        python3 \
+ && apk add \
         make \
         cmake \
         g++

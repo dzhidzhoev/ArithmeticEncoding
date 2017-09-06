@@ -13,7 +13,8 @@ COMPRESSED_SIZE = 'compressed_size'
 CONCLUSION = 'conclusion'
 
 DIR_TESTS = os.path.split(os.path.abspath(__file__))[0]
-DIR_TEST_FILES = os.path.join(DIR_TESTS, 'test_files')
+DIR_ROOT = os.path.normpath(os.path.join(DIR_TESTS, os.pardir))
+DIR_TEST_FILES = os.path.join(DIR_ROOT, 'test_files')
 DIR_TEST_OUTPUT = os.path.join(DIR_TESTS, 'output')
 FILE_RESULTS = os.path.join(DIR_TESTS, 'results.csv')
 FILE_CONFIG = os.path.join(DIR_TESTS, 'config.cfg')
