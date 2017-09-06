@@ -102,6 +102,11 @@ Options\n\n\
         }
     }
     print_config(opts);
+
+    if (!can_open_file(opts->ifile)) {
+        return NULL;
+    }
+
     return opts;
 }
 
@@ -153,4 +158,14 @@ void free_compress_opts(CompressOptions *opts) {
         }
         free(opts);
     }
+}
+
+int can_open_file(const char *filename) {
+    FILE *f = fopen(filename, "rb");
+    if (!f) {
+        return 0;
+    }
+
+    fclose(f);
+    return 1;
 }
