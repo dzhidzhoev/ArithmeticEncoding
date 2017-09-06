@@ -25,7 +25,7 @@ Options\n\n\
         }
         else if (!strcmp(argv[i], "--input")) {
             if (++i < argc) {
-                opts->ifile = realloc(opts->ifile, sizeof(char) * sizeof(*(argv[i])));
+                opts->ifile = realloc(opts->ifile, sizeof(char) * (strlen(argv[i]) + 1));
                 strcpy(opts->ifile, argv[i]);
                 continue;
             }
@@ -37,7 +37,7 @@ Options\n\n\
         }
         else if (!strcmp(argv[i], "--output")) {
             if (++i < argc) {
-                opts->ofile = realloc(opts->ofile, sizeof(char) * sizeof(*(argv[i])));
+                opts->ofile = realloc(opts->ofile, sizeof(char) * (strlen(argv[i]) + 1));
                 strcpy(opts->ofile, argv[i]);
                 continue;
             }
@@ -102,17 +102,25 @@ Options\n\n\
         }
     }
     print_config(opts);
+
+    if (!can_open_file(opts->ifile)) {
+        return NULL;
+    }
+
     return opts;
 }
 
 CompressOptions *default_config(void) {
+    const char DEFAULT_INPUT_FILENAME[] = "input.txt";
+    const char DEFAULT_OUTPUT_FILENAME[] = "output.txt";
+
     CompressOptions *default_opts = calloc(1, sizeof(*default_opts));
 
-    default_opts->ifile = calloc(sizeof(char), 10);
-    strcpy(default_opts->ifile, "input.txt");
+    default_opts->ifile = calloc(sizeof(char), sizeof(DEFAULT_INPUT_FILENAME));
+    strcpy(default_opts->ifile, DEFAULT_INPUT_FILENAME);
 
-    default_opts->ofile = calloc(sizeof(char), 11);
-    strcpy(default_opts->ofile, "output.txt");
+    default_opts->ofile = calloc(sizeof(char), sizeof(DEFAULT_OUTPUT_FILENAME));
+    strcpy(default_opts->ofile, DEFAULT_OUTPUT_FILENAME);
 
     default_opts->mode = 'c';
     default_opts->method = ARI;
@@ -153,4 +161,14 @@ void free_compress_opts(CompressOptions *opts) {
         }
         free(opts);
     }
+}
+
+int can_open_file(const char *filename) {
+    FILE *f = fopen(filename, "rb");
+    if (!f) {
+        return 0;
+    }
+
+    fclose(f);
+    return 1;
 }

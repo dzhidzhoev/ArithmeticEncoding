@@ -4,8 +4,8 @@
 #include "bwt.h"
 
 void compress_bwt(char *ifile, char *ofile) {
-	FILE *ifp = (FILE *)fopen(ifile, "rb");
-	FILE *ofp = (FILE *)fopen(ofile, "wb");
+    FILE *ifp = (FILE *)fopen(ifile, "rb");
+    FILE *ofp = (FILE *)fopen(ofile, "wb");
 
     /** PUT YOUR CODE HERE
       * implement an arithmetic encoding algorithm with BWT for compression
@@ -13,7 +13,7 @@ void compress_bwt(char *ifile, char *ofile) {
     */
 
     // This is an implementation of simple copying
-	size_t n, m;
+    size_t n, m;
     unsigned char buff[8192];
 
     do {
@@ -24,13 +24,13 @@ void compress_bwt(char *ifile, char *ofile) {
             m = 0;
     } while ((n > 0) && (n == m));
 
-	fclose(ifp);
-	fclose(ofp);
+    fclose(ifp);
+    fclose(ofp);
 }
 
 void decompress_bwt(char *ifile, char *ofile) {
-	FILE *ifp = (FILE *)fopen(ifile, "rb");
-	FILE *ofp = (FILE *)fopen(ofile, "wb");
+    FILE *ifp = (FILE *)fopen(ifile, "rb");
+    FILE *ofp = (FILE *)fopen(ofile, "wb");
 
     /** PUT YOUR CODE HERE
       * implement an arithmetic encoding algorithm with BWT for decompression
@@ -38,7 +38,7 @@ void decompress_bwt(char *ifile, char *ofile) {
     */
 
     // This is an implementation of simple copying
-	size_t n, m;
+    size_t n, m;
     unsigned char buff[8192];
 
     do {
@@ -49,6 +49,6 @@ void decompress_bwt(char *ifile, char *ofile) {
             m = 0;
     } while ((n > 0) && (n == m));
 
-	fclose(ifp);
-	fclose(ofp);
+    fclose(ifp);
+    fclose(ofp);
 }

@@ -20,3 +20,5 @@ CompressOptions *default_config(void);
 void print_config(CompressOptions *opts);
 
 void free_compress_opts(CompressOptions *opts);
+
+int can_open_file(const char *filename);
