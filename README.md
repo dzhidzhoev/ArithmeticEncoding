@@ -1,15 +1,15 @@
 # Задание №1 **"Универсальный архиватор"**
 
 ## Содержание
-1. [Описание](## 1. Описание)
-2. [Правила игры](## 2. Правила игры)
-3. [Алгоритм действий](## 3. Алгоритм действий)
-4. [Сборка](## 4. Сборка)
-  * [Linux](### **Linux**)
-  * [Windows](### *Windows**)
-5. [Запуск](## 5. Запуск)
-6. [Работа с репозиторием и системой контроля версий](## 6. Работа с репозиторием и системой контроля версий)
-7. [Описание репозитория](## 7. Описание репозитория)
+1. [Описание](https://gitlab.com/Ploshkin/compressor/README.md## 1. Описание)
+2. [Правила игры](https://gitlab.com/Ploshkin/compressor/README.md## 2. Правила игры)
+3. [Алгоритм действий](https://gitlab.com/Ploshkin/compressor/README.md## 3. Алгоритм действий)
+4. [Сборка](https://gitlab.com/Ploshkin/compressor/README.md## 4. Сборка)
+  * [Linux](https://gitlab.com/Ploshkin/compressor/README.md### **Linux**)
+  * [Windows](https://gitlab.com/Ploshkin/compressor/README.md### *Windows**)
+5. [Запуск](https://gitlab.com/Ploshkin/compressor/README.md## 5. Запуск)
+6. [Работа с репозиторием и системой контроля версий](https://gitlab.com/Ploshkin/compressor/README.md## 6. Работа с репозиторием и системой контроля версий)
+7. [Описание репозитория](https://gitlab.com/Ploshkin/compressor/README.md## 7. Описание репозитория)
 
 ## 1. Описание
 Вам необходимо реализовать архиватор.
