@@ -52,9 +52,7 @@ def run_test(*, method, exe_path, test_dir, test_file, timeout, output_dir):
                       test_dir=test_dir,
                       output_dir=output_dir)
 
-    # Use context manager to clean up files
-    with cmpr:
-        conclusion, compressed_size = cmpr.run_test()
+    conclusion, compressed_size = cmpr.run_test()
 
     return {ORIGINAL_SIZE: original_size,
             COMPRESSED_SIZE: compressed_size,

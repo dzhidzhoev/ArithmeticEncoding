@@ -1,8 +1,27 @@
+import tempfile
 import filecmp
 import os
+from contextlib import contextmanager, ExitStack
 
 from . import OK, WRONG_ANSWER
 from .command import Command
+
+
+@contextmanager
+def temp_files(n):
+    with ExitStack() as stack:
+        filenames = [
+            stack.enter_context(tempfile.NamedTemporaryFile())
+            for _ in range(n)
+        ]
+        yield filenames
+
+
+class CompressorError(Exception):
+    def __init__(self, conclusion, *args, compressed_size=None):
+        super().__init__(*args)
+        self.conclusion = conclusion
+        self.compressed_size = compressed_size
 
 
 class Compressor:
@@ -28,17 +47,21 @@ class Compressor:
                            working_directory=self.test_dir)
         return err_code
 
-    def compress(self):
-        return self.execute(input_f=self.test_file,
-                            output_f=self.test_file + '.cmp',
-                            mode='c',
-                            name='compress')
+    def compress(self, compressed_filename):
+        return self.execute(
+            input_f=self.test_file,
+            output_f=compressed_filename,
+            mode='c',
+            name='compress',
+        )
 
-    def decompress(self):
-        return self.execute(input_f=self.test_file + '.cmp',
-                            output_f=self.test_file + '.dcm',
-                            mode='d',
-                            name='decompress')
+    def decompress(self, compressed_filename, decompressed_filename):
+        return self.execute(
+            input_f=compressed_filename,
+            output_f=decompressed_filename,
+            mode='d',
+            name='decompress',
+        )
 
     def output_filename(self, mode):
         if self.output_dir:
@@ -49,33 +72,52 @@ class Compressor:
         else:
             return None
 
-    def clean(self):
-        # Use try-except to prevent async errors
-        try:
-            os.remove(self.test_path + '.cmp')
-            os.remove(self.test_path + '.dcm')
-        except FileNotFoundError:
-            pass
-
     def run_test(self):
-        err_code = self.compress()
+        with temp_files(2) as (compressed, decompressed):
+            compressed_filename = compressed.name
+            decompressed_filename = decompressed.name
+            try:
+                compressed_size = self._run_test(
+                    compressed_filename,
+                    decompressed_filename,
+                )
+                return OK, compressed_size
+            except CompressorError as e:
+                return e.conclusion, e.compressed_size
+
+    def _run_test(self, compressed_filename, decompressed_filename):
+        self._run_compress(compressed_filename)
+        self._run_decompress(compressed_filename, decompressed_filename)
+
+        try:
+            compressed_size = os.path.getsize(compressed_filename)
+        except FileNotFoundError:
+            raise CompressorError(WRONG_ANSWER + '2')
+
+        if not filecmp.cmp(self.test_path,
+                           decompressed_filename,
+                           shallow=False):
+            raise CompressorError(
+                WRONG_ANSWER + '2',
+                compressed_size=compressed_size,
+            )
+
+        return compressed_size
+
+    def _run_compress(self, compressed_filename):
+        err_code = self.compress(compressed_filename)
         if err_code != OK:
-            return err_code + '1', None
+            raise CompressorError(err_code + '1')
 
-        err_code = self.decompress()
+        if not os.path.exists(compressed_filename):
+            raise CompressorError(WRONG_ANSWER + '1')
+
+    def _run_decompress(self, compressed_filename, decompressed_filename):
+
+        err_code = self.decompress(compressed_filename, decompressed_filename)
         if err_code != OK:
-            return err_code + '2', None
+            raise CompressorError(err_code + '2')
 
-        compressed_size = os.path.getsize(self.test_path + '.cmp')
-
-        if filecmp.cmp(self.test_path,
-                       self.test_path + '.dcm',
-                       shallow=False):
-            return OK, compressed_size
-        return WRONG_ANSWER, compressed_size
-
-    def __enter__(self):
-        pass
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        self.clean()
+        if not os.path.exists(compressed_filename) \
+                or not os.path.exists(decompressed_filename):
+            raise CompressorError(WRONG_ANSWER + '2')
