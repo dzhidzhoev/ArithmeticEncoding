@@ -202,6 +202,7 @@
 1. Установите [Docker](https://docker.com)
 2. Склонируйте ваш репозиторий
 3. Соберите образ и запустите контейнер:
+
 ```bash
 docker build . -t compressor_tests
 docker run compressor_tests
@@ -436,3 +437,4 @@ git push my_cmpr master
         
         Этот файл необходим для тестирующего скрипта, чтобы определить,
         какие методы тестировать.
+
