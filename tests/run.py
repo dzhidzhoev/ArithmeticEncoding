@@ -98,7 +98,7 @@ def save_results(results, filename=FILE_RESULTS):
               ORIGINAL_SIZE,
               COMPRESSED_SIZE,
               CONCLUSION]
-    with open(filename, 'w') as resfile:
+    with open(filename, 'w', newline='') as resfile:
         writer = csv.writer(resfile)
         writer.writerow(header)
         for row in results:
