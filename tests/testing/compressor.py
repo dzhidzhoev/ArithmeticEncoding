@@ -10,8 +10,10 @@ from .command import Command
 @contextmanager
 def temp_filepaths(*args):
     with tempfile.TemporaryDirectory() as temp_dir_name:
-        for filename in args:
-            yield os.path.join(temp_dir_name, filename)
+        yield [
+            os.path.join(temp_dir_name, filename)
+            for filename in args
+        ]
 
 
 class CompressorError(Exception):
