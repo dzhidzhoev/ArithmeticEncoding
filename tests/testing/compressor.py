@@ -8,13 +8,10 @@ from .command import Command
 
 
 @contextmanager
-def temp_files(n):
-    with ExitStack() as stack:
-        filenames = [
-            stack.enter_context(tempfile.NamedTemporaryFile())
-            for _ in range(n)
-        ]
-        yield filenames
+def temp_filepaths(*args):
+    with tempfile.TemporaryDirectory() as temp_dir_name:
+        for filename in args:
+            yield os.path.join(temp_dir_name, filename)
 
 
 class CompressorError(Exception):
@@ -73,9 +70,9 @@ class Compressor:
             return None
 
     def run_test(self):
-        with temp_files(2) as (compressed, decompressed):
-            compressed_filename = compressed.name
-            decompressed_filename = decompressed.name
+        with temp_filepaths('compressed', 'decompressed') as (compressed, decompressed):
+            compressed_filename = compressed
+            decompressed_filename = decompressed
             try:
                 compressed_size = self._run_test(
                     compressed_filename,
