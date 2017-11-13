@@ -1,18 +1,20 @@
-IMAGE=compressor_tests
+IMAGE=compressor_tests:latest
 
-all: build-and-run
+all: run
 
-build-and-run:
+# Testing
+
+build:
 	docker build . -t $(IMAGE)
-	make run
 
 no-cache:
 	docker build . -t $(IMAGE) --no-cache
-	make run
 
-run:
+run: build
 	docker run $(IMAGE)
 
+sh: build
+	docker run -it $(IMAGE) /bin/sh
 
 # Base image stuff
 
@@ -26,8 +28,5 @@ base-push:
 
 base-build-and-push: base-build base-push
 
-sh:
-	docker run -it $(IMAGE) /bin/sh
 
-
-.PHONY: all build-and-run no-cache run base-build base-push base-build-and-push
+.PHONY: all build run no-cache sh base-build base-push base-build-and-push

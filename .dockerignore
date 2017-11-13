@@ -1,0 +1,8 @@
+# Clion files
+.idea
+
+# Build files
+build
+
+# Git files
+.git
