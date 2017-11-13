@@ -12,6 +12,9 @@ RUN mkdir /project/build \
 FROM library/python:3.6-alpine
 MAINTAINER Borodin Gregory <grihabor@mail.ru>
 
+RUN apk update \
+ && apk add libstdc++
+
 ADD tests /project/tests
 ADD test_files /project/test_files
 
