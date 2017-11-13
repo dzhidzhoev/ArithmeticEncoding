@@ -1,4 +1,4 @@
-IMAGE=compressor_tests
+IMAGE=compressor_tests:latest
 
 all: build-and-run
 
@@ -13,6 +13,8 @@ no-cache:
 run:
 	docker run $(IMAGE)
 
+sh:
+	docker run -it $(IMAGE) /bin/sh
 
 # Base image stuff
 
@@ -25,9 +27,6 @@ base-push:
 	docker push grihabor/compressor_base:latest
 
 base-build-and-push: base-build base-push
-
-sh:
-	docker run -it $(IMAGE) /bin/sh
 
 
 .PHONY: all build-and-run no-cache run base-build base-push base-build-and-push
