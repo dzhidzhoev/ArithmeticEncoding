@@ -39,7 +39,7 @@
 * За использование чужих исходных текстов или совместное написание — 
   работы всех причастных будут сниматься с замеров, и им будет присуждаться 0 баллов.
   Подробнее — читайте [Stanford CS Honor Code](http://csmajor.stanford.edu/HonorCode.shtml).
-* Если разрхивированный файл не совпадает с исходным,
+* Если раза рхивированный файл не совпадает с исходным,
   компрессор падает или работает более 3 минут,
   ему присваивается значение худшего результата в замере.
 * За первые три места в любой номинации (после собеседования по алгоритму)
@@ -57,10 +57,6 @@
 8. Зарегистрироваться на https://videocourse.graphics.cs.msu.ru
 9. Привязать репозиторий (Add repository), обратите внимание на пример URL
 10. Сделать его активным (Activate)
-
-* Поводу пунктов 8—10:
-  выполняйте их в последнюю очередь, сервер https://videocourse.graphics.cs.msu.ru
-  сейчас постоянно дорабатывается, поэтому могут возникать неполадки.
 
 ## Сборка
 ### **Unix**
@@ -84,11 +80,11 @@
 
     ```sh
     cd path/to/favorite/folder
-    git clone https://gitlab.com/Ploshkin/compression.git
+    git clone https://gitlab.com/Ploshkin/compressor.git
     ```
-    После этого там должна появиться папка compression.
+    После этого там должна появиться папка compressor.
     
-4. Заходим в папку compression, создаём папку build и заходим в неё:
+4. Заходим в папку compressor, создаём папку build и заходим в неё:
 
     ```sh
     mkdir build
@@ -116,15 +112,15 @@
 6. Собираем проект удобным образом, например:
 
     ```sh
-    make  # нужно быть в папке compression/build
+    make  # нужно быть в папке compressor/build
     ```
     
-7. Проверяем папку compression/build на наличие исполняемого файла
+7. Проверяем папку compressor/build на наличие исполняемого файла
    compress.
 8. Тестируем шаблон:
 
     ```sh
-    cd ..  # поднимаемся из build в папку compression
+    cd ..  # поднимаемся из build в папку compressor
     python3 tests/run.py
     ```
     
@@ -149,11 +145,11 @@
 
     ```sh
     cd path/to/favorite/folder
-    git clone https://gitlab.com/Ploshkin/compression
+    git clone https://gitlab.com/Ploshkin/compressor
     ```
-    После этого там должна появиться папка compression.
+    После этого там должна появиться папка compressor.
     
-7. Заходим в папку compression, создаём папку build и заходим в неё:
+7. Заходим в папку compressor, создаём папку build и заходим в неё:
 
     ```sh
     mkdir build
@@ -180,10 +176,10 @@
 9. Собираем проект удобным образом, например:
 
     ```sh
-    mingw32-make  # нужно быть в папке compression/build
+    mingw32-make  # нужно быть в папке compressor/build
     ```
     
-10. Проверяем папку compression/build на наличие исполняемого файла
+10. Проверяем папку compressor/build на наличие исполняемого файла
    compress.exe.
 11. Тестируем шаблон:
 
