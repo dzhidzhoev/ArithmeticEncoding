@@ -13,5 +13,5 @@ test:
     - python3 tests/run.py
   artifacts:
     paths:
-        - tests/results.csv
+        - results.csv
     expire_in: 3 weeks
