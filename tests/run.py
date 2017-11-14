@@ -101,8 +101,10 @@ def save_results(results, filename=FILE_RESULTS):
     with open(filename, 'w', newline='') as resfile:
         writer = csv.writer(resfile)
         writer.writerow(header)
+        resfile.flush()
         for row in results:
             writer.writerow([row[column] for column in header])
+            resfile.flush()
 
 
 def main():
