@@ -20,4 +20,4 @@ ADD test_files /project/test_files
 
 COPY --from=builder_image /project/build/compress /project/build/compress
 
-CMD python3 /project/tests/run.py && cat /project/tests/results.csv
+CMD python3 /project/tests/run.py && cat /project/results.csv
