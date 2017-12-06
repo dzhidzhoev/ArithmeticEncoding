@@ -18,6 +18,7 @@ RUN apk update \
 ADD tests /project/tests
 ADD test_files /project/test_files
 
+ADD src /project/src
 COPY --from=builder_image /project/build/compress /project/build/compress
 
 CMD python3 /project/tests/run.py && cat /project/results.csv
