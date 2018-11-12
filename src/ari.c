@@ -114,10 +114,10 @@ unsigned long long FREQ_ADD_COEFF = (1 << 15);
 const int FREQS_SCALE_COEFF = 2;
 
 typedef uint32_t value_type;
-const value_type top_val = ~(value_type)0;
-const value_type half_val = top_val / 2 + 1;
-const value_type quart1_val = top_val / 4 + 1;
-const value_type quart3_val = half_val + quart1_val;
+value_type top_val;
+value_type half_val;
+value_type quart1_val;
+value_type quart3_val;
 
 static void clear_counts_table() {
     read_bytes = 0;
@@ -127,16 +127,15 @@ static void clear_counts_table() {
 }
 
 static void init_tables() {
+    top_val = ~(value_type)0;
+    half_val = top_val / 2 + 1;
+    quart1_val = top_val / 4 + 1;
+    quart3_val = half_val + quart1_val;
+
     freqs_summ = 0;
     for (int i = 0; i < N; i++) {
         freqs[i] = 1;
         freqs_summ++;
-    }
-
-    for (int j = 0; j < COEFFS_CNT; j++) {
-        for (int i = 0; i < N; i++) {
-            freqs_coeffs[j][i] = 1;
-        }
     }
 }
 
