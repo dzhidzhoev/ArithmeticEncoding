@@ -108,17 +108,9 @@ enum { N = sizeof(freqs) / sizeof(*freqs) };
 static unsigned freq_ranges[N + 1];
 static unsigned counts[N];
 static unsigned long long freqs_summ;
-const unsigned long long MAX_FREQS_SUMM = (1 << 26) - 1;
-const int COEFFS_CNT = 4;
-const unsigned long long COEFF[COEFFS_CNT] = {
-    1000000,
-    5000000,
-    10000000,
-    50000000,
-};
-static unsigned long long freqs_coeffs[COEFFS_CNT][N];
+const unsigned long long MAX_FREQS_SUMM = (1 << 28) - 1;
 const int WINDOW_LEN = 256;
-unsigned long long FREQ_ADD_COEFF = (1 << 24);
+unsigned long long FREQ_ADD_COEFF = (1 << 15);
 const int FREQS_SCALE_COEFF = 2;
 
 typedef uint32_t value_type;
@@ -149,17 +141,17 @@ static void init_tables() {
 }
 
 static void modify_table(int ch) {
-    // freqs[ch] += max(counts[ch], 1) * FREQ_ADD_COEFF;
-    // counts[ch]++;
+    freqs[ch] += FREQ_ADD_COEFF;
+    // counts[ch]++];
     ++read_bytes;
-    // if (read_bytes % WINDOW_LEN == 0) {
-    if (read_bytes == WINDOW_LEN) {
-        for (int i = 0; i <= 10; i++) {
-            freqs[i] = MAX_FREQS_SUMM / 11 - 30;
-        }
-        for (int i = 11; i <= N; i++) {
-            freqs[i] = 1;
-        }
+    if (read_bytes % WINDOW_LEN == 0) {
+    // if (read_bytes == WINDOW_LEN) {
+        // for (int i = 0; i <= 10; i++) {
+        //     freqs[i] = MAX_FREQS_SUMM / 11 - 30;
+        // }
+        // for (int i = 11; i <= N; i++) {
+        //     freqs[i] = 1;
+        // }
         // clear_counts_table();
     }
 }
