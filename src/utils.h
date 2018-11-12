@@ -1,5 +1,9 @@
 #pragma once
 
+#include <limits.h>
+#include <stdint.h>
+#include <stdio.h>
+
 enum {
     ARI,
     PPM,
@@ -22,3 +26,16 @@ void print_config(CompressOptions *opts);
 void free_compress_opts(CompressOptions *opts);
 
 int can_open_file(const char *filename);
+
+struct bit_rw_buf {
+    int wait;
+    uint8_t data;
+};
+
+void write_bit(FILE *out, struct bit_rw_buf *buf, unsigned val);
+
+int read_bit(FILE *in, struct bit_rw_buf *buf);
+
+void write_buf(FILE *out, struct bit_rw_buf *buf);
+
+void read_buf(FILE *in, struct bit_rw_buf *buf);

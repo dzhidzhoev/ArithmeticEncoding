@@ -6,6 +6,7 @@
 #include <stdint.h>
 
 #include "ari.h"
+#include "utils.h"
 
 // #define DEBUG_PRINT
 // #define DEBUG_DATA
@@ -18,81 +19,6 @@ static inline long long min(long long a, long long b) {
     return a < b ? a : b;
 }
 
-struct bit_rw_buf {
-    int wait;
-    uint8_t data;
-};
-
-
-void write_buf(FILE *out, struct bit_rw_buf *buf) {
-    if (buf->wait) {
-        buf->data <<= CHAR_BIT - buf->wait;
-        fwrite(&buf->data, sizeof(buf->data), 1, out);
-        buf->wait = 0;
-#ifdef DEBUG_PRINT
-        // printf("BUF FLUSH %x\n", buf->data);
-#endif
-        buf->data = 0;
-    }
-}
-
-void read_buf(FILE *in, struct bit_rw_buf *buf) {
-    buf->wait += CHAR_BIT * fread(&buf->data, 1, sizeof(buf->data), in);
-#ifdef DEBUG_PRINT
-    // printf("BUF GRAB %x\n", buf->data);
-#endif
-}
-
-#ifndef DEBUG_DATA
-
-void write_bit(FILE *out, struct bit_rw_buf *buf, unsigned val) {
-    if (buf->wait == CHAR_BIT * sizeof(buf->data)) {
-        write_buf(out, buf);
-    }
-    buf->data <<= 1;
-    buf->data |= val;
-    buf->wait++;
-}
-
-int read_bit(FILE *in, struct bit_rw_buf *buf) {
-    while (1) {
-        if (buf->wait) {
-            int res = (buf->data >> (buf->wait - 1)) & 1;
-            buf->wait--;
-            return res;
-        } 
-        if (feof(in)) {
-            return 0;
-        }
-        read_buf(in, buf);
-        if (ferror(in)) {
-            return 0;
-        }
-    }
-}
-
-#else
-
-void write_bit(FILE *out, struct bit_rw_buf *buf, unsigned val) {
-    fputc(val + '0', out);
-#ifdef DEBUG_PRINT
-    printf("\t\t\t\t\tWRITE BIT %d\n", val);
-#endif
-}
-
-int read_bit(FILE *in, struct bit_rw_buf *buf) {
-    int ch = fgetc(in);
-    if (ch > 0) {
-        // printf("READ BIT %d\n", ch - '0');
-        return ch - '0';
-    } else {
-        // printf("READ BIT 0\n");
-        return 0;
-    }
-}
-
-#endif
-
 static int prev_bits = 0;
 static void output_bit(FILE *out, struct bit_rw_buf *buf, unsigned val) {
     write_bit(out, buf, val);
@@ -103,17 +29,36 @@ static void output_bit(FILE *out, struct bit_rw_buf *buf, unsigned val) {
 }
 
 static unsigned read_bytes = 0;
-static unsigned freqs[1 << CHAR_BIT];
-enum { N = sizeof(freqs) / sizeof(*freqs) };
-static unsigned freq_ranges[N + 1];
-static unsigned counts[N];
-static unsigned long long freqs_summ;
-const unsigned long long MAX_FREQS_SUMM = (1 << 28) - 1;
-const int WINDOW_LEN = 256;
-unsigned long long FREQ_ADD_COEFF = (1 << 15);
-const int FREQS_SCALE_COEFF = 2;
+enum { N = 1 << CHAR_BIT };
 
-typedef uint32_t value_type;
+struct freq_info {
+    unsigned freq;
+    int sym;
+};
+
+static int cmp_freqs(const void *_f1, const void *_f2) {
+    const struct freq_info *f1 = _f1;
+    const struct freq_info *f2 = _f2;
+    if (f1->freq > f2->freq) {
+        return 1;
+    } else if (f1->freq == f2->freq) {
+        return 0;
+    }
+    return -1;
+}
+
+static struct freq_info freqs[N];
+static unsigned freq_ranges[N + 1];
+static int total_count;
+static int counts[N];
+static int global_counts[N];
+static unsigned long long freqs_summ;
+static const unsigned long long MAX_FREQS_SUMM = (1 << 24) - 1;
+static const int WINDOW_LEN = 256;
+static const unsigned long long FREQ_ADD_COEFF = (1 << 15);
+static const int FREQS_SCALE_COEFF = 2;
+
+typedef uint64_t value_type;
 value_type top_val;
 value_type half_val;
 value_type quart1_val;
@@ -126,44 +71,59 @@ static void clear_counts_table() {
     }
 }
 
+enum { BITS_USED = 40 };
 static void init_tables() {
-    top_val = ~(value_type)0;
+    top_val = (1ull << BITS_USED) - 1;
     half_val = top_val / 2 + 1;
     quart1_val = top_val / 4 + 1;
     quart3_val = half_val + quart1_val;
 
     freqs_summ = 0;
     for (int i = 0; i < N; i++) {
-        freqs[i] = 1;
+        freqs[i].freq = 1;
+        freqs[i].sym = i;
         freqs_summ++;
+
+        counts[i] = 0;
+        global_counts[i] = 0;
+    }
+
+    total_count = 0;
+}
+
+static void prepare_table_with_stat() {
+    for (int i = 0; i < N; i++) {
+        if (!global_counts[i]) {
+            freqs[i].freq = 0;
+        }
     }
 }
 
 static void modify_table(int ch) {
-    freqs[ch] += FREQ_ADD_COEFF;
-    // counts[ch]++];
+    freqs[ch].freq += FREQ_ADD_COEFF;
+    counts[ch]++;
     ++read_bytes;
     if (read_bytes % WINDOW_LEN == 0) {
-    // if (read_bytes == WINDOW_LEN) {
-        // for (int i = 0; i <= 10; i++) {
-        //     freqs[i] = MAX_FREQS_SUMM / 11 - 30;
-        // }
-        // for (int i = 11; i <= N; i++) {
-        //     freqs[i] = 1;
-        // }
-        // clear_counts_table();
+    }
+
+    for (int i = 0; i < N; i++) {
+        if (counts[i] == global_counts[i]) {
+            freqs[i].freq = 0;
+        }
     }
 }
 
 static void update_tables() {
     freqs_summ = 0;
     for (int i = 0; i < N; i++) {
-        freqs_summ += freqs[i];
+        freqs_summ += freqs[i].freq;
     }
     if (freqs_summ >= MAX_FREQS_SUMM) {
         for (int i = 0; i < N; i++) {
-            freqs[i] /= FREQS_SCALE_COEFF;
-            freqs[i] = max(freqs[i], 1);
+            if (freqs[i].freq) {
+                freqs[i].freq /= FREQS_SCALE_COEFF;
+                freqs[i].freq = max(freqs[i].freq, 1);
+            }
         }
         update_tables();
         return;
@@ -177,7 +137,7 @@ static void update_tables() {
 static void update_freqs_ranges() {
     freq_ranges[0] = 0;
     for (int i = 1; i <= N; i++) {
-        freq_ranges[i] = freq_ranges[i - 1] + freqs[i - 1];
+        freq_ranges[i] = freq_ranges[i - 1] + freqs[i - 1].freq;
     }
 }
 
@@ -185,10 +145,46 @@ static void print_table() {
     int summ = 0;
     printf("[");
     for (int i = 0; i < N; i++) {
-        summ += freqs[i];
+        summ += freqs[i].freq;
         printf("%d, ", summ);
     }
     printf("]\n");
+}
+
+static void write_counts_table(FILE *ofp) {
+    int cnt = 0;
+    for (int i = 0; i < N; i++) {
+        if (global_counts[i]) {
+            cnt++;
+        }
+    }
+    fwrite(&cnt, sizeof(cnt), 1, ofp);
+    for (int i = 0; i < N; i++) {
+        if (global_counts[i]) {
+            fputc(i, ofp);
+            fwrite(global_counts + i, sizeof(global_counts[i]), 1, ofp);
+        }
+    }
+}
+
+static void read_counts_table(FILE *ifp) {
+    int cnt;
+    fread(&cnt, sizeof(cnt), 1, ifp);
+    for (int i = 0; i < N; i++) {
+        global_counts[i] = 0;
+    }
+    for (int i = 0; i < cnt; i++) {
+        int c = fgetc(ifp);
+        fread(global_counts + c, sizeof(global_counts[c]), 1, ifp);
+    }
+}
+
+static void count_stat(FILE *ifp) {
+    int ch;
+    while ((ch = fgetc(ifp)) != -1) {
+        global_counts[ch]++;
+        total_count++;
+    }
 }
 
 void compress_ari(char *ifile, char *ofile) {
@@ -198,11 +194,15 @@ void compress_ari(char *ifile, char *ofile) {
     struct bit_rw_buf rbuf = {}, wbuf = {};
     init_tables();
 
-    fseek(ifp, 0, SEEK_END);
-    int32_t input_size = ftell(ifp);
+    count_stat(ifp);
+    int32_t input_size = total_count;
     fseek(ifp, 0, SEEK_SET);
 
     fwrite(&input_size, sizeof(input_size), 1, ofp);
+
+    write_counts_table(ofp);
+
+    prepare_table_with_stat();
 
     value_type left = 0, right = top_val;
 
@@ -235,6 +235,8 @@ void compress_ari(char *ifile, char *ofile) {
             left <<= 1;
             right <<= 1;
             right++;
+            left &= top_val;
+            right &= top_val;
 #ifdef DEBUG_PRINT            
             printf("[%u %u]\n", left, right);
 #endif
@@ -267,8 +269,12 @@ void decompress_ari(char *ifile, char *ofile) {
     int32_t file_size;
     fread(&file_size, sizeof(file_size), 1, ifp);
 
+    read_counts_table(ifp);
+
+    prepare_table_with_stat();
+
     value_type value = 0;
-    for (int i = 0; i < CHAR_BIT * sizeof(value_type); i++) {
+    for (int i = 0; i < BITS_USED; i++) {
         value <<= 1;
         value |= read_bit(ifp, &rbuf);
     }
@@ -281,7 +287,7 @@ void decompress_ari(char *ifile, char *ofile) {
         update_freqs_ranges();
     
         // printf("NEXT LEFT %d RIGHT %d\n", left, right);
-        long cur_point = (((unsigned long long)value - left + 1) * (freqs_summ) - 1) / ((unsigned long long)right - left + 1);
+        long long cur_point = (((unsigned long long)value - left + 1) * (freqs_summ) - 1) / ((unsigned long long)right - left + 1);
 #ifdef DEBUG_PRINT
         printf("CUR POINT %ld FREQS_SUMM %llu VALUE 0x%x %d\n", cur_point, freqs_summ, value, value);
 #endif
@@ -291,7 +297,7 @@ void decompress_ari(char *ifile, char *ofile) {
                 break;
             }
         }
-        int symbol = i - 1;
+        int symbol = freqs[i - 1].sym;
         fputc(symbol, ofp);
 #ifdef DEBUG_PRINT
         printf("WRITE %d\n", symbol);
@@ -323,6 +329,9 @@ void decompress_ari(char *ifile, char *ofile) {
             left <<= 1;
             right <<= 1;
             right++;
+            left &= top_val;
+            right &= top_val;
+            value &= top_val;
 #ifdef DEBUG_PRINT
             printf("[%u %u]\n", left, right);
 #endif

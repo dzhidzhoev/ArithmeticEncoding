@@ -172,3 +172,72 @@ int can_open_file(const char *filename) {
     fclose(f);
     return 1;
 }
+
+#ifndef DEBUG_DATA
+
+void write_bit(FILE *out, struct bit_rw_buf *buf, unsigned val) {
+    if (buf->wait == CHAR_BIT * sizeof(buf->data)) {
+        write_buf(out, buf);
+    }
+    buf->data <<= 1;
+    buf->data |= val;
+    buf->wait++;
+}
+
+int read_bit(FILE *in, struct bit_rw_buf *buf) {
+    while (1) {
+        if (buf->wait) {
+            int res = (buf->data >> (buf->wait - 1)) & 1;
+            buf->wait--;
+            return res;
+        } 
+        if (feof(in)) {
+            return 0;
+        }
+        read_buf(in, buf);
+        if (ferror(in)) {
+            return 0;
+        }
+    }
+}
+
+#else
+
+void write_bit(FILE *out, struct bit_rw_buf *buf, unsigned val) {
+    fputc(val + '0', out);
+#ifdef DEBUG_PRINT
+    printf("\t\t\t\t\tWRITE BIT %d\n", val);
+#endif
+}
+
+int read_bit(FILE *in, struct bit_rw_buf *buf) {
+    int ch = fgetc(in);
+    if (ch > 0) {
+        // printf("READ BIT %d\n", ch - '0');
+        return ch - '0';
+    } else {
+        // printf("READ BIT 0\n");
+        return 0;
+    }
+}
+
+#endif
+
+void write_buf(FILE *out, struct bit_rw_buf *buf) {
+    if (buf->wait) {
+        buf->data <<= CHAR_BIT - buf->wait;
+        fwrite(&buf->data, sizeof(buf->data), 1, out);
+        buf->wait = 0;
+#ifdef DEBUG_PRINT
+        // printf("BUF FLUSH %x\n", buf->data);
+#endif
+        buf->data = 0;
+    }
+}
+
+void read_buf(FILE *in, struct bit_rw_buf *buf) {
+    buf->wait += CHAR_BIT * fread(&buf->data, 1, sizeof(buf->data), in);
+#ifdef DEBUG_PRINT
+    // printf("BUF GRAB %x\n", buf->data);
+#endif
+}
